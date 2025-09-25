@@ -1,0 +1,70 @@
+<!-- Champ de recherche temps réel -->
+<div class="mb-4">
+  <input
+    [formControl]="queryControl"
+    placeholder="Rechercher un film..."
+    class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+</div>
+
+<!-- Loader -->
+@if (loading()) {
+  <div class="flex items-center justify-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+    <span class="ml-2 text-gray-600">Recherche en cours...</span>
+  </div>
+}
+
+<!-- Message d'aide -->
+@if (!searchPerformed() && !loading()) {
+  <div class="text-center py-8 text-gray-500">
+    <p>Tapez le nom d'un film pour commencer la recherche</p>
+  </div>
+}
+
+<!-- Aucun résultat -->
+@if (!loading() && searchPerformed() && movies().length === 0) {
+  <div class="text-center py-8 text-gray-500">
+    <p>Aucun résultat trouvé pour "{{ queryControl.value }}"</p>
+  </div>
+}
+
+<!-- Liste des films -->
+@if (movies().length > 0) {
+  <ul class="space-y-4">
+    @for (movie of movies(); track trackById($index, movie)) {
+      <li class="border rounded-lg p-4 flex gap-4 hover:shadow-md transition-shadow">
+        @if (movie.posterUrl) {
+          <img
+            [src]="movie.posterUrl"
+            width="100"
+            height="150"
+            [alt]="movie.title"
+            class="object-cover rounded"
+          />
+        } @else {
+          <div class="w-[100px] h-[150px] bg-gray-200 rounded flex items-center justify-center">
+            <span class="text-gray-400 text-xs text-center">Pas d'image</span>
+          </div>
+        }
+        
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-gray-900">{{ movie.title }} ({{ movie.year }})</h3>
+          
+          @if (movie.aggregateRating !== undefined) {
+            <p class="text-yellow-600 font-medium">
+              ⭐ {{ movie.aggregateRating }}/10 
+              @if (movie.voteCount) {
+                <span class="text-gray-500 text-sm">({{ movie.voteCount }} votes)</span>
+              }
+            </p>
+          }
+          
+          @if (movie.imdbId) {
+            <p class="text-sm text-gray-600">IMDB: {{ movie.imdbId }}</p>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+}
