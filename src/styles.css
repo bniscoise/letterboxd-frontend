@@ -1,2 +1,38 @@
-/* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+@theme {
+  --color-monokai-background: #272822;
+  --color-monokai-surface: #1e1f1c;
+  --color-monokai-surface-highlight: #2d2e2a;
+  --color-monokai-accent: #fd971f;
+  --color-monokai-yellow: #e6db74;
+  --color-monokai-green: #a6e22e;
+  --color-monokai-cyan: #66d9ef;
+  --color-monokai-pink: #f92672;
+  --color-monokai-purple: #ae81ff;
+  --color-monokai-text: #f8f8f2;
+  --color-monokai-muted: #75715e;
+  --color-monokai-border: #3e3d32;
+
+  --shadow-monokai: 0 10px 25px -15px rgba(253, 151, 31, 0.45);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-monokai-background text-monokai-text min-h-screen antialiased;
+  }
+
+  a {
+    @apply text-monokai-cyan transition-colors hover:text-monokai-yellow;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply bg-monokai-surface text-monokai-text placeholder:text-monokai-muted;
+  }
+}

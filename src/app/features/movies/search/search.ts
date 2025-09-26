@@ -20,16 +20,15 @@ export class SearchComponent {
   private movieService = inject(MovieService);
 
   constructor() {
-    // Recherche en temps réel
     this.queryControl.valueChanges
       .pipe(
-        debounceTime(300), // attend 300ms après la dernière frappe
-        distinctUntilChanged(), // évite les appels pour la même valeur
+        debounceTime(300), 
+        distinctUntilChanged(),
         tap(() => {
           this.loading.set(true);
           this.searchPerformed.set(true);
         }),
-        filter(query => query.trim().length > 0), // ignore les chaînes vides
+        filter(query => query.trim().length > 0),
         switchMap(query =>
           this.movieService.searchMovies(query.trim())
             .pipe(finalize(() => this.loading.set(false)))
