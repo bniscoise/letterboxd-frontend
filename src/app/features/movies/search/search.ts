@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap, tap } from 'rxjs';
@@ -13,35 +13,70 @@ import { MovieService, MovieDto } from '../../../core/services/movie.service';
 export class SearchComponent {
   queryControl = new FormControl('', { nonNullable: true });
 
+  private readonly PAGE_SIZE = 10;
+
   movies = signal<MovieDto[]>([]);
   loading = signal(false);
   searchPerformed = signal(false);
+  currentPage = signal(1);
+
+  pagedMovies = computed(() => {
+    const start = (this.currentPage() - 1) * this.PAGE_SIZE;
+    return this.movies().slice(start, start + this.PAGE_SIZE);
+  });
+
+  totalPages = computed(() => {
+    return Math.max(1, Math.ceil(this.movies().length / this.PAGE_SIZE));
+  });
+
+  pageNumbers = computed(() => {
+    return Array.from({ length: this.totalPages() }, (_, index) => index + 1);
+  });
 
   private movieService = inject(MovieService);
 
   constructor() {
-    // Recherche en temps réel
     this.queryControl.valueChanges
       .pipe(
-        debounceTime(300), // attend 300ms après la dernière frappe
-        distinctUntilChanged(), // évite les appels pour la même valeur
+        debounceTime(300), 
+        distinctUntilChanged(),
         tap(() => {
           this.loading.set(true);
           this.searchPerformed.set(true);
         }),
-        filter(query => query.trim().length > 0), // ignore les chaînes vides
+        filter(query => query.trim().length > 0),
         switchMap(query =>
           this.movieService.searchMovies(query.trim())
             .pipe(finalize(() => this.loading.set(false)))
         )
       )
       .subscribe({
-        next: results => this.movies.set(Array.isArray(results) ? results : []),
-        error: () => this.movies.set([]),
+        next: results => {
+          this.currentPage.set(1);
+          this.movies.set(Array.isArray(results) ? results : []);
+        },
+        error: () => {
+          this.currentPage.set(1);
+          this.movies.set([]);
+        }
       });
   }
 
   trackById(index: number, movie: MovieDto) {
     return movie.id;
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  previousPage() {
+    this.goToPage(this.currentPage() - 1);
+  }
+
+  nextPage() {
+    this.goToPage(this.currentPage() + 1);
   }
 }

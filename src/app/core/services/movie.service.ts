@@ -4,13 +4,14 @@ import { Observable, of } from 'rxjs';
 
 export interface MovieDto {
   id: number;
-  imdbId: string;
-  title: string;
-  year: number;
+  primaryTitle: string;
+  originalTitle?: string;
+  startYear?: number;
   posterUrl?: string;
   aggregateRating?: number;
   voteCount?: number;
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
