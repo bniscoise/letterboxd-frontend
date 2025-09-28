@@ -13,7 +13,7 @@ import { MovieService, MovieDto } from '../../../core/services/movie.service';
 export class SearchComponent {
   queryControl = new FormControl('', { nonNullable: true });
 
-  private readonly pageSize = 10;
+  private readonly PAGE_SIZE = 10;
 
   movies = signal<MovieDto[]>([]);
   loading = signal(false);
@@ -21,12 +21,12 @@ export class SearchComponent {
   currentPage = signal(1);
 
   pagedMovies = computed(() => {
-    const start = (this.currentPage() - 1) * this.pageSize;
-    return this.movies().slice(start, start + this.pageSize);
+    const start = (this.currentPage() - 1) * this.PAGE_SIZE;
+    return this.movies().slice(start, start + this.PAGE_SIZE);
   });
 
   totalPages = computed(() => {
-    return Math.max(1, Math.ceil(this.movies().length / this.pageSize));
+    return Math.max(1, Math.ceil(this.movies().length / this.PAGE_SIZE));
   });
 
   pageNumbers = computed(() => {

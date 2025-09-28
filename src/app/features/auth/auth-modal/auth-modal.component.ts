@@ -21,7 +21,7 @@ export type RegisterPayload = {
     <div class="space-y-5">
       <div class="space-y-3">
         <span class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Notez vos films préférés!</span>
-        <h1 class="text-4xl font-semibold text-monokai-green drop-shadow">Movieboxd par Benjamin Nisçoise</h1>
+        <h1 class="text-4xl font-semibold text-monokai-green drop-shadow">Movieboxd par Benkamin Nisçoise</h1>
         <p class="max-w-xl text-monokai-yellow/90">
           Un projet en Java Spring Boot et Angular
         </p>
