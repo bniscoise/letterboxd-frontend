@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthModalComponent, LoginPayload, RegisterPayload } from './features/auth/auth-modal/auth-modal.component';
+import { AuthModalComponent } from './features/auth/auth-modal/auth-modal.component';
 import { SearchComponent } from './features/movies/search/search';
-import { HttpClient } from '@angular/common/http';
+import { AuthService, LoginPayload, RegisterPayload } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,8 +12,11 @@ import { HttpClient } from '@angular/common/http';
     <div class="min-h-screen bg-monokai-background text-monokai-text">
       <div class="mx-auto max-w-5xl px-4 py-12 space-y-10">
         <app-auth-modal
+          [isAuthenticated]="isAuthenticated()"
+          [user]="currentUser()"
           (login)="onLogin($event)"
           (register)="onRegister($event)"
+          (logout)="onLogout()"
         ></app-auth-modal>
 
         <section class="rounded-xl border border-monokai-border bg-monokai-surfaceHighlight/80 p-6 shadow-monokai">
@@ -26,37 +29,26 @@ import { HttpClient } from '@angular/common/http';
   `,
 })
 export class App {
-  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+
+  protected readonly isAuthenticated = this.authService.isAuthenticated;
+  protected readonly currentUser = this.authService.user;
 
   onLogin(payload: LoginPayload): void {
-    this.http
-      .post<{ token?: string }>('http://localhost:8080/api/auth/login', payload)
-      .subscribe({
-        next: (response) => {
-          if (response?.token) {
-            localStorage.setItem('authToken', response.token);
-          }
-          console.debug('Login succeeded', response);
-        },
-        error: (error) => {
-          console.error('Login failed', error);
-        },
-      });
+    this.authService.login(payload).subscribe({
+      next: (user) => console.debug('Login succeeded', user),
+      error: (error) => console.error('Login failed', error),
+    });
   }
 
   onRegister(payload: RegisterPayload): void {
-    this.http
-      .post<{ token?: string }>('http://localhost:8080/api/auth/register', payload)
-      .subscribe({
-        next: (response) => {
-          if (response?.token) {
-            localStorage.setItem('authToken', response.token);
-          }
-          console.debug('Registration succeeded', response);
-        },
-        error: (error) => {
-          console.error('Registration failed', error);
-        },
-      });
+    this.authService.register(payload).subscribe({
+      next: (user) => console.debug('Registration succeeded', user),
+      error: (error) => console.error('Registration failed', error),
+    });
+  }
+
+  onLogout(): void {
+    this.authService.logout();
   }
 }
