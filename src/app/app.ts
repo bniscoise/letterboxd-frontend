@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthModalComponent, LoginPayload, RegisterPayload } from './features/auth/auth-modal/auth-modal.component';
 import { SearchComponent } from './features/movies/search/search';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -25,13 +26,37 @@ import { SearchComponent } from './features/movies/search/search';
   `,
 })
 export class App {
+  private readonly http = inject(HttpClient);
+
   onLogin(payload: LoginPayload): void {
-    // TODO: connecter au backend d'authentification
-    console.debug('Login submitted', payload);
+    this.http
+      .post<{ token?: string }>('http://localhost:8080/api/auth/login', payload)
+      .subscribe({
+        next: (response) => {
+          if (response?.token) {
+            localStorage.setItem('authToken', response.token);
+          }
+          console.debug('Login succeeded', response);
+        },
+        error: (error) => {
+          console.error('Login failed', error);
+        },
+      });
   }
 
   onRegister(payload: RegisterPayload): void {
-    // TODO: appeler l\'API d\'inscription
-    console.debug('Register submitted', payload);
+    this.http
+      .post<{ token?: string }>('http://localhost:8080/api/auth/register', payload)
+      .subscribe({
+        next: (response) => {
+          if (response?.token) {
+            localStorage.setItem('authToken', response.token);
+          }
+          console.debug('Registration succeeded', response);
+        },
+        error: (error) => {
+          console.error('Registration failed', error);
+        },
+      });
   }
 }
