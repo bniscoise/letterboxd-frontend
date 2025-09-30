@@ -17,7 +17,7 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3" *ngIf="!isAuthenticated; else loggedIn">
+      <div class="flex flex-wrap items-center gap-3 py-2 " *ngIf="!isAuthenticated; else loggedIn">
         <button
           type="button"
           class="rounded-lg border border-monokai-border bg-monokai-surface px-4 py-2 text-sm font-medium transition hover:border-monokai-accent hover:text-monokai-accent"
@@ -49,7 +49,7 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
     </div>
 
     <div *ngIf="isModalOpen" class="fixed inset-0 z-40 flex items-center justify-center">
-      <div class="absolute inset-0 bg-black/70" (click)="closeModals()"></div>
+      <div class="absolute inset-0 bg-black/80" (click)="closeModals()"></div>
 
       <div
         class="relative z-50 w-full max-w-md rounded-2xl border border-monokai-border bg-monokai-surfaceHighlight p-6 text-monokai-text shadow-monokai"
