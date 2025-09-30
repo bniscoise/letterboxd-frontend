@@ -14,8 +14,10 @@ import { AuthService, LoginPayload, RegisterPayload } from './core/services/auth
         <app-auth-modal
           [isAuthenticated]="isAuthenticated()"
           [user]="currentUser()"
+          [authError]="authError"
           (login)="onLogin($event)"
           (register)="onRegister($event)"
+          (clearError)="authError = null"
           (logout)="onLogout()"
         ></app-auth-modal>
 
@@ -33,18 +35,31 @@ export class App {
 
   protected readonly isAuthenticated = this.authService.isAuthenticated;
   protected readonly currentUser = this.authService.user;
+  protected authError: string | null = null;
 
   onLogin(payload: LoginPayload): void {
+    this.authError = null;
     this.authService.login(payload).subscribe({
-      next: (user) => console.debug('Login succeeded', user),
-      error: (error) => console.error('Login failed', error),
+      next: () => {
+        this.authError = null;
+      },
+      error: (error) => {
+        console.error('Login failed', error);
+        this.authError = error?.message || 'Impossible de se connecter.';
+      },
     });
   }
 
   onRegister(payload: RegisterPayload): void {
+    this.authError = null;
     this.authService.register(payload).subscribe({
-      next: (user) => console.debug('Registration succeeded', user),
-      error: (error) => console.error('Registration failed', error),
+      next: () => {
+        this.authError = null;
+      },
+      error: (error) => {
+        console.error('Registration failed', error);
+        this.authError = error?.message || 'La création du compte a échoué.';
+      },
     });
   }
 

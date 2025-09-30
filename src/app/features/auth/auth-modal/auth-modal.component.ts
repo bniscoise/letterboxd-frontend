@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/auth.service';
 
@@ -89,6 +89,9 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 required
               />
             </label>
+            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              {{ authError }}
+            </div>
             <button
               type="submit"
               class="w-full rounded-lg bg-monokai-accent px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
@@ -133,10 +136,12 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 [(ngModel)]="registerForm.password"
                 class="w-full rounded-lg border border-monokai-border bg-monokai-background px-3 py-2 text-monokai-text focus:border-monokai-accent focus:outline-none"
                 autocomplete="new-password"
-                required
+              required
               />
             </label>
-
+            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              {{ authError }}
+            </div>
             <button
               type="submit"
               class="w-full rounded-lg bg-monokai-accent px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
@@ -149,12 +154,14 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
     </div>
   `,
 })
-export class AuthModalComponent {
+export class AuthModalComponent implements OnChanges {
   @Input() isAuthenticated = false;
   @Input() user: AuthUser | null = null;
+  @Input() authError: string | null = null;
   @Output() login = new EventEmitter<LoginPayload>();
   @Output() register = new EventEmitter<RegisterPayload>();
   @Output() logout = new EventEmitter<void>();
+  @Output() clearError = new EventEmitter<void>();
 
   showLoginModal = false;
   showRegisterModal = false;
@@ -178,31 +185,41 @@ export class AuthModalComponent {
     this.resetForms();
     this.showRegisterModal = false;
     this.showLoginModal = true;
+    this.clearError.emit();
   }
 
   openRegisterModal(): void {
     this.resetForms();
     this.showLoginModal = false;
     this.showRegisterModal = true;
+    this.clearError.emit();
   }
 
   closeModals(): void {
     this.showLoginModal = false;
     this.showRegisterModal = false;
+    this.clearError.emit();
   }
 
   submitLogin(): void {
     this.login.emit({ ...this.loginForm });
-    this.closeModals();
   }
 
   submitRegister(): void {
     this.register.emit({ ...this.registerForm });
-    this.closeModals();
   }
 
   private resetForms(): void {
     this.loginForm = { username: '', password: '' };
     this.registerForm = { username: '', email: '', password: '' };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user'] && this.user) {
+      // Close any open modal once user becomes available (success auth)
+      if (this.isModalOpen) {
+        this.closeModals();
+      }
+    }
   }
 }
