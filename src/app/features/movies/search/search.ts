@@ -6,11 +6,21 @@ import { MovieService, MovieDto } from '../../../core/services/movie.service';
 import { RatingStarsComponent } from '../../../shared/ui/rating-stars/rating-stars.component';
 import { UserMovieDto, UserMovieService } from '../../../core/services/user-movie.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { MovieResultsComponent } from './components/movie-results/movie-results.component';
+import { UserMovieListComponent } from './components/user-movie-list/user-movie-list.component';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RatingStarsComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RatingStarsComponent,
+    SearchBarComponent,
+    MovieResultsComponent,
+    UserMovieListComponent
+  ],
   templateUrl: './search.component.html'
 })
 export class SearchComponent {
@@ -78,31 +88,37 @@ export class SearchComponent {
   }
 
   openUserMovies() {
-  const user = this.authService.user();
-  if (!user) return; 
-  this.loading.set(true);
-  this.userMovieService.getUserMovies(user.id, user.token)
-    .pipe(finalize(() => this.loading.set(false)))
-    .subscribe({
-      next: list => { this.userMovies.set(list ?? []); this.isUserListOpen.set(true); },
-      error: () => { this.userMovies.set([]); this.isUserListOpen.set(true); }
-    });
-}
+    const user = this.authService.user();
+    if (!user) {
+      return;
+    }
 
-closeUserMovies() {
-  this.isUserListOpen.set(false);
-}
-
-toggleReview(movieId: number) {
-  const map = { ...this.reviewOpen() };
-  map[movieId] = !map[movieId];
-  this.reviewOpen.set(map);
-}
-
-
-  trackById(index: number, movie: MovieDto) {
-    return movie.id;
+    this.loading.set(true);
+    this.userMovieService
+      .getUserMovies(user.id, user.token)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: list => {
+          this.userMovies.set(list ?? []);
+          this.isUserListOpen.set(true);
+        },
+        error: () => {
+          this.userMovies.set([]);
+          this.isUserListOpen.set(true);
+        }
+      });
   }
+
+  closeUserMovies() {
+    this.isUserListOpen.set(false);
+  }
+
+  toggleReview(movieId: number) {
+    const map = { ...this.reviewOpen() };
+    map[movieId] = !map[movieId];
+    this.reviewOpen.set(map);
+  }
+
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
