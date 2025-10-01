@@ -1,6 +1,6 @@
 import { inject, Injectable, computed, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
 export interface LoginPayload {
   username: string;
@@ -33,13 +33,19 @@ export class AuthService {
   login(payload: LoginPayload): Observable<AuthUser> {
     return this.http
       .post<AuthUser>('http://localhost:8080/api/auth/login', payload)
-      .pipe(tap((user) => this.persistUser(user)));
+      .pipe(
+        tap((user) => this.persistUser(user)),
+        catchError((err) => this.handleError(err))
+      );
   }
 
   register(payload: RegisterPayload): Observable<AuthUser> {
     return this.http
       .post<AuthUser>('http://localhost:8080/api/auth/register', payload)
-      .pipe(tap((user) => this.persistUser(user)));
+      .pipe(
+        tap((user) => this.persistUser(user)),
+        catchError((err) => this.handleError(err))
+      );
   }
 
   logout(): void {
@@ -76,5 +82,20 @@ export class AuthService {
 
     localStorage.removeItem(this.storageKey);
     return null;
+  }
+
+  private handleError(error: unknown) {
+    let message = 'Une erreur est survenue';
+    const err = error as HttpErrorResponse;
+
+    if (err?.status === 0) {
+      message = 'Impossible de joindre le serveur';
+    } else if (typeof err?.error === 'string' && err.error.trim()) {
+      message = err.error;
+    } else if (err?.error?.message) {
+      message = err.error.message;
+    }
+
+    return throwError(() => new Error(message));
   }
 }

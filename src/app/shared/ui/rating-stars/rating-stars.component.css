@@ -1,0 +1,67 @@
+:host {
+  display: inline-block;
+}
+
+.rating-stars {
+  display: inline-flex;
+  gap: 0.3rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.rating-stars.readonly {
+  cursor: default;
+}
+
+.star-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.star-wrapper app-star-icon {
+  pointer-events: none;
+}
+
+.hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.rating-stars.readonly .hit,
+.hit:disabled {
+  cursor: default;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--focus-ring, #2563eb);
+  outline-offset: 2px;
+}
+
+.hit.half.left {
+  left: 0;
+  width: 50%;
+}
+
+.hit.half.right {
+  right: 0;
+  width: 50%;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

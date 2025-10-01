@@ -1,0 +1,41 @@
+<div
+  class="rating-stars"
+  (mouseleave)="clearPreview()"
+  [class.readonly]="readonly"
+>
+  <ng-container *ngFor="let star of stars; let index = index; trackBy: trackByIndex">
+    <div class="star-wrapper">
+      <app-star-icon
+        [size]="size"
+        [fill]="fillFor(index)"
+        [activeColor]="activeColor"
+        [inactiveColor]="inactiveColor"
+        [strokeColor]="strokeColor"
+      ></app-star-icon>
+      <button
+        type="button"
+        class="hit half left"
+        [disabled]="readonly"
+        (mouseenter)="preview(index + 0.5)"
+        (focus)="preview(index + 0.5)"
+        (click)="select(index + 0.5)"
+        [attr.aria-label]="'Attribuer ' + (index + 0.5) + ' étoile' + ((index + 0.5) > 1 ? 's' : '')"
+        [attr.aria-pressed]="!readonly && displayRating >= index + 0.5 ? true : null"
+      >
+        <span class="sr-only">{{ index + 0.5 }} étoile{{ (index + 0.5) > 1 ? 's' : '' }}</span>
+      </button>
+      <button
+        type="button"
+        class="hit half right"
+        [disabled]="readonly"
+        (mouseenter)="preview(index + 1)"
+        (focus)="preview(index + 1)"
+        (click)="select(index + 1)"
+        [attr.aria-label]="'Attribuer ' + (index + 1) + ' étoile' + ((index + 1) > 1 ? 's' : '')"
+        [attr.aria-pressed]="!readonly && displayRating >= index + 1 ? true : null"
+      >
+        <span class="sr-only">{{ index + 1 }} étoile{{ (index + 1) > 1 ? 's' : '' }}</span>
+      </button>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,12 @@
+:host {
+  display: inline-block;
+}
+
+svg {
+  display: block;
+}
+
+.star-fill,
+.star-outline {
+  pointer-events: none;
+}

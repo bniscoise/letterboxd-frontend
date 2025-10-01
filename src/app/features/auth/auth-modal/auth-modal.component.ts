@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/auth.service';
 
@@ -11,13 +11,13 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
     <div class="space-y-5">
       <div class="space-y-3">
         <span class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Notez vos films préférés!</span>
-        <h1 class="text-4xl font-semibold text-monokai-green drop-shadow">Movieboxd par Benjinis</h1>
+        <h1 class="text-4xl font-semibold text-monokai-green drop-shadow">Movieboxd par Benjamin Nisçoise </h1>
         <p class="max-w-xl text-monokai-yellow/90">
           Un projet en Java Spring Boot et Angular
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3" *ngIf="!isAuthenticated; else loggedIn">
+      <div class="flex flex-wrap items-center gap-3 py-2 " *ngIf="!isAuthenticated; else loggedIn">
         <button
           type="button"
           class="rounded-lg border border-monokai-border bg-monokai-surface px-4 py-2 text-sm font-medium transition hover:border-monokai-accent hover:text-monokai-accent"
@@ -49,7 +49,7 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
     </div>
 
     <div *ngIf="isModalOpen" class="fixed inset-0 z-40 flex items-center justify-center">
-      <div class="absolute inset-0 bg-black/70" (click)="closeModals()"></div>
+      <div class="absolute inset-0 bg-black/80" (click)="closeModals()"></div>
 
       <div
         class="relative z-50 w-full max-w-md rounded-2xl border border-monokai-border bg-monokai-surfaceHighlight p-6 text-monokai-text shadow-monokai"
@@ -89,6 +89,9 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 required
               />
             </label>
+            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              {{ authError }}
+            </div>
             <button
               type="submit"
               class="w-full rounded-lg bg-monokai-accent px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
@@ -133,10 +136,12 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 [(ngModel)]="registerForm.password"
                 class="w-full rounded-lg border border-monokai-border bg-monokai-background px-3 py-2 text-monokai-text focus:border-monokai-accent focus:outline-none"
                 autocomplete="new-password"
-                required
+              required
               />
             </label>
-
+            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              {{ authError }}
+            </div>
             <button
               type="submit"
               class="w-full rounded-lg bg-monokai-accent px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
@@ -149,12 +154,14 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
     </div>
   `,
 })
-export class AuthModalComponent {
+export class AuthModalComponent implements OnChanges {
   @Input() isAuthenticated = false;
   @Input() user: AuthUser | null = null;
+  @Input() authError: string | null = null;
   @Output() login = new EventEmitter<LoginPayload>();
   @Output() register = new EventEmitter<RegisterPayload>();
   @Output() logout = new EventEmitter<void>();
+  @Output() clearError = new EventEmitter<void>();
 
   showLoginModal = false;
   showRegisterModal = false;
@@ -178,31 +185,41 @@ export class AuthModalComponent {
     this.resetForms();
     this.showRegisterModal = false;
     this.showLoginModal = true;
+    this.clearError.emit();
   }
 
   openRegisterModal(): void {
     this.resetForms();
     this.showLoginModal = false;
     this.showRegisterModal = true;
+    this.clearError.emit();
   }
 
   closeModals(): void {
     this.showLoginModal = false;
     this.showRegisterModal = false;
+    this.clearError.emit();
   }
 
   submitLogin(): void {
     this.login.emit({ ...this.loginForm });
-    this.closeModals();
   }
 
   submitRegister(): void {
     this.register.emit({ ...this.registerForm });
-    this.closeModals();
   }
 
   private resetForms(): void {
     this.loginForm = { username: '', password: '' };
     this.registerForm = { username: '', email: '', password: '' };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user'] && this.user) {
+      // Close any open modal once user becomes available (success auth)
+      if (this.isModalOpen) {
+        this.closeModals();
+      }
+    }
   }
 }
