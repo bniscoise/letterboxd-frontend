@@ -91,7 +91,7 @@ export class AuthService {
     if (err?.status === 0) {
       message = 'Impossible de joindre le serveur';
     } else if (typeof err?.error === 'string' && err.error.trim()) {
-      message = err.error; // message renvoyé par GlobalExceptionHandler (text/plain)
+      message = err.error;
     } else if (err?.error?.message) {
       message = err.error.message;
     }
