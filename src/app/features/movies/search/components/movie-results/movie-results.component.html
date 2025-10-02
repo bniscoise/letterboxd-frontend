@@ -30,7 +30,7 @@
       [src]="movie.posterUrl"
       width="100"
       height="150"
-      [alt]="movie.originalTitle || movie.primaryTitle"
+      [alt]="movie.primaryTitle || movie.originalTitle"
       class="h-[150px] w-[100px] rounded object-cover shadow-inner"
     />
     } @else {
@@ -44,7 +44,7 @@
     <div class="flex-1 space-y-3">
       <div>
         <h3 class="text-xl font-semibold text-monokai-text">
-          {{ movie.originalTitle || movie.primaryTitle }}
+          {{ movie.primaryTitle || movie.originalTitle }}
         </h3>
         <p class="text-sm uppercase tracking-wide text-monokai-muted">{{ movie.startYear }}</p>
       </div>
@@ -67,6 +67,7 @@
         <button
           class="px-4 py-3 bg-monokai-accent rounded-lg text-monokai-background transition hover:bg-monokai-yellow"
           type="button"
+          (click)="onViewInformation(movie)"
         >
           Informations
         </button>

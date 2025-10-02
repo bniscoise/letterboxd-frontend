@@ -22,6 +22,7 @@ export class MovieResultsComponent {
   @Output() readonly previousPage = new EventEmitter<void>();
   @Output() readonly nextPage = new EventEmitter<void>();
   @Output() readonly goToPage = new EventEmitter<number>();
+  @Output() readonly viewInformation = new EventEmitter<MovieDto>();
 
   trackById(index: number, movie: MovieDto) {
     return movie.id;
@@ -41,5 +42,9 @@ export class MovieResultsComponent {
 
   onGoToPage(page: number) {
     this.goToPage.emit(page);
+  }
+
+  onViewInformation(movie: MovieDto) {
+    this.viewInformation.emit(movie);
   }
 }

@@ -16,8 +16,17 @@ export class UserMovieListComponent {
   @Input() canToggleReview = false;
 
   @Output() readonly reviewToggle = new EventEmitter<number>();
+  @Output() readonly viewInformation = new EventEmitter<UserMovieDto>();
+  @Output() readonly deleteUserMovie = new EventEmitter<UserMovieDto>();
 
   onToggleReview(movieId: number) {
     this.reviewToggle.emit(movieId);
+  }
+  onViewInformation(movie: UserMovieDto) {
+    this.viewInformation.emit(movie);
+  }
+
+  onDeleteMovie(movie: UserMovieDto) {
+    this.deleteUserMovie.emit(movie);
   }
 }

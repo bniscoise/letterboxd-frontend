@@ -26,4 +26,8 @@ export class MovieService {
     const url = `${this.apiUrl}/search?q=${encodeURIComponent(query)}`;
     return this.http.get<MovieDto[]>(url);
   }
+
+  getMovieById(id: number): Observable<MovieDto> {
+    return this.http.get<MovieDto>(`${this.apiUrl}/${id}`);
+  }
 }

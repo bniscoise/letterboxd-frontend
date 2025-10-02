@@ -1,0 +1,72 @@
+<div class="space-y-6">
+  <div class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Informations du film</p>
+    <h1 class="text-3xl font-semibold text-monokai-green">
+      @if (movie) {
+      {{ movie.primaryTitle }}
+      } @else { Film introuvable }
+    </h1>
+  </div>
+
+  @if (movie) {
+  <div
+    class="flex flex-col gap-6 rounded-xl border border-monokai-border bg-monokai-surface-highlight/80 p-6 shadow-monokai sm:flex-row"
+  >
+    @if (movie.posterUrl) {
+    <img
+      [src]="movie.posterUrl"
+      width="200"
+      height="300"
+      [alt]="movie.primaryTitle"
+      class="h-[300px] w-[200px] rounded object-cover shadow-inner"
+    />
+    } @else {
+    <div
+      class="flex h-[300px] w-[200px] items-center justify-center rounded border border-monokai-border bg-monokai-surface"
+    >
+      <span class="text-center text-sm text-monokai-muted">Pas d'image</span>
+    </div>
+    }
+
+    <div class="flex-1 space-y-4">
+      @if (movie.aggregateRating !== undefined) {
+      <p class="text-lg font-medium text-monokai-yellow">
+        ⭐ {{ movie.aggregateRating }}/10 @if (movie.voteCount) {
+        <span class="ml-1 text-sm text-monokai-muted">({{ movie.voteCount }} votes)</span>
+        }
+      </p>
+      } @if (movie.startYear) {
+      <p class="text-sm text-monokai-text">Sortie: {{ movie.startYear }}</p>
+      } @if (movie.originalTitle && movie.originalTitle !== movie.primaryTitle) {
+      <p class="text-sm text-monokai-muted">Titre original: {{ movie.originalTitle }}</p>
+      }
+
+      <div class="pt-4">
+        <a
+          class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
+          routerLink="/search"
+        >
+          ← Retour à la recherche
+        </a>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div
+    class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-6 text-monokai-text"
+  >
+    <p>
+      Impossible de retrouver les informations du film sélectionné. Retournez à la recherche et
+      réessayez.
+    </p>
+    <div class="pt-4">
+      <a
+        class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
+        routerLink="/search"
+      >
+        ← Retour à la recherche
+      </a>
+    </div>
+  </div>
+  }
+</div>

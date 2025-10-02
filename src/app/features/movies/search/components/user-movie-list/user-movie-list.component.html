@@ -19,7 +19,7 @@
   <li
     class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow transition hover:shadow-monokai"
   >
-    <div class="flex items-start justify-between gap-5">
+    <div class="flex items-center justify-between">
       <div class="space-y-1">
         <h3 class="text-lg font-semibold text-monokai-text">{{ um.movieTitle }}</h3>
         <div class="mt-1 flex items-center gap-2">
@@ -34,13 +34,29 @@
       </div>
 
       @if (canToggleReview) {
-      <button
-        type="button"
-        class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:text-monokai-text"
-        (click)="onToggleReview(um.movieId)"
-      >
-        Voir la critique
-      </button>
+      <div class="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:bg-monokai-green hover:text-monokai-background"
+          (click)="onToggleReview(um.movieId)"
+        >
+          Voir votre review
+        </button>
+        <button
+          class="px-3 py-2 text-sm bg-monokai-accent rounded-lg text-monokai-background transition hover:bg-monokai-yellow"
+          type="button"
+          (click)="onViewInformation(um)"
+        >
+          Informations
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border border-red-500/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
+          (click)="onDeleteMovie(um)"
+        >
+          Supprimer
+        </button>
+      </div>
       }
     </div>
 

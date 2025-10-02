@@ -9,6 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { MovieResultsComponent } from './components/movie-results/movie-results.component';
 import { UserMovieListComponent } from './components/user-movie-list/user-movie-list.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -59,6 +60,7 @@ export class SearchComponent {
   private movieService = inject(MovieService);
   private userMovieService = inject(UserMovieService);
   public authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor() {
     this.queryControl.valueChanges
@@ -108,6 +110,31 @@ export class SearchComponent {
         }
       });
   }
+  deleteUserMovie(userMovie: UserMovieDto) {
+    const user = this.authService.user();
+    if (!user) {
+      return;
+    }
+
+    this.loading.set(true);
+    this.userMovieService
+      .deleteUserMovie(user.id, userMovie.movieId, user.token)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.userMovies.update(list =>
+            list.filter(movie => movie.movieId !== userMovie.movieId)
+          );
+
+          this.reviewOpen.update(map => {
+            const next = { ...map };
+            delete next[userMovie.movieId];
+            return next;
+          });
+        },
+        error: () => {}
+      });
+  }
 
   closeUserMovies() {
     this.isUserListOpen.set(false);
@@ -145,6 +172,52 @@ export class SearchComponent {
     this.modalRating = 0;
     this.reviewControl.reset('');
     this.isAddModalOpen.set(true);
+  }
+
+  viewMovieInformation(movie: MovieDto) {
+    const movieId = movie.id;
+    if (movieId == null) {
+      return;
+    }
+
+    this.router.navigate(['informations', movieId], {
+      state: { movie }
+    });
+  }
+
+  viewUserMovieInformation(userMovie: UserMovieDto) {
+    const movieId = userMovie.movieId;
+    if (movieId == null) {
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.movieService
+      .getMovieById(movieId)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: movie => {
+          const payload = movie ?? {
+            id: movieId,
+            primaryTitle: userMovie.movieTitle
+          };
+
+          this.router.navigate(['informations', movieId], {
+            state: { movie: payload }
+          });
+        },
+        error: () => {
+          const fallback: MovieDto = {
+            id: movieId,
+            primaryTitle: userMovie.movieTitle
+          };
+
+          this.router.navigate(['informations', movieId], {
+            state: { movie: fallback }
+          });
+        }
+      });
   }
 
   closeAddModal(force = false) {

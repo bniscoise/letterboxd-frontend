@@ -43,6 +43,13 @@ export class UserMovieService {
   getUserMovies(userId: number, token?: string) {
   const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
   return this.http.get<UserMovieDto[]>(`${this.baseUrl}/${userId}`, { headers });
-}
+  }
 
+  deleteUserMovie(userId: number, movieId: number, token?: string) {
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : undefined;
+
+    return this.http.delete<void>(`${this.baseUrl}/${userId}/${movieId}`, { headers });
+  }
 }

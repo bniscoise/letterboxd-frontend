@@ -25,6 +25,8 @@
   [reviewOpen]="reviewOpen()"
   [canToggleReview]="authService.isAuthenticated()"
   (reviewToggle)="toggleReview($event)"
+  (viewInformation)="viewUserMovieInformation($event)"
+  (deleteUserMovie)="deleteUserMovie($event)"
 ></app-user-movie-list>
 } @if (!isUserListOpen()) {
 <app-search-bar [control]="queryControl"></app-search-bar>
@@ -42,6 +44,7 @@
   (previousPage)="previousPage()"
   (nextPage)="nextPage()"
   (goToPage)="goToPage($event)"
+  (viewInformation)="viewMovieInformation($event)"
 ></app-movie-results>
 } @if (isAddModalOpen()) {
 <div class="fixed inset-0 z-40 flex items-center justify-center">
