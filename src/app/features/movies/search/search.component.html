@@ -1,133 +1,133 @@
 <div class="mb-4 flex gap-3">
   @if (authService.isAuthenticated()) {
-    <button
-      type="button"
-      class="rounded-lg bg-monokai-accent px-3 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
-      (click)="openUserMovies()"
-    >
-      Mes films
-    </button>
-  }
-  @if (isUserListOpen()) {
-    <button
-      type="button"
-      class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-sm transition hover:text-monokai-text"
-      (click)="closeUserMovies()"
-    >
-      Retour à la recherche
-    </button>
+  <button
+    type="button"
+    class="rounded-lg bg-monokai-accent px-3 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
+    (click)="openUserMovies()"
+  >
+    Mes films
+  </button>
+  } @if (isUserListOpen()) {
+  <button
+    type="button"
+    class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-sm transition hover:text-monokai-text"
+    (click)="closeUserMovies()"
+  >
+    Retour à la recherche
+  </button>
   }
 </div>
 
 @if (isUserListOpen()) {
-  <app-user-movie-list
-    [userMovies]="userMovies()"
-    [loading]="loading()"
-    [reviewOpen]="reviewOpen()"
-    [canToggleReview]="authService.isAuthenticated()"
-    (reviewToggle)="toggleReview($event)"
-  ></app-user-movie-list>
-}
+<app-user-movie-list
+  [userMovies]="userMovies()"
+  [loading]="loading()"
+  [reviewOpen]="reviewOpen()"
+  [canToggleReview]="authService.isAuthenticated()"
+  (reviewToggle)="toggleReview($event)"
+></app-user-movie-list>
+} @if (!isUserListOpen()) {
+<app-search-bar [control]="queryControl"></app-search-bar>
 
-@if (!isUserListOpen()) {
-  <app-search-bar [control]="queryControl"></app-search-bar>
+<app-movie-results
+  [loading]="loading()"
+  [searchPerformed]="searchPerformed()"
+  [query]="queryControl.value"
+  [movies]="movies()"
+  [pagedMovies]="pagedMovies()"
+  [currentPage]="currentPage()"
+  [totalPages]="totalPages()"
+  [pageNumbers]="pageNumbers()"
+  (addMovie)="openAddModal($event)"
+  (previousPage)="previousPage()"
+  (nextPage)="nextPage()"
+  (goToPage)="goToPage($event)"
+></app-movie-results>
+} @if (isAddModalOpen()) {
+<div class="fixed inset-0 z-40 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/80" (click)="closeAddModal()"></div>
 
-  <app-movie-results
-    [loading]="loading()"
-    [searchPerformed]="searchPerformed()"
-    [query]="queryControl.value"
-    [movies]="movies()"
-    [pagedMovies]="pagedMovies()"
-    [currentPage]="currentPage()"
-    [totalPages]="totalPages()"
-    [pageNumbers]="pageNumbers()"
-    (addMovie)="openAddModal($event)"
-    (previousPage)="previousPage()"
-    (nextPage)="nextPage()"
-    (goToPage)="goToPage($event)"
-  ></app-movie-results>
-}
-
-@if (isAddModalOpen()) {
-  <div class="fixed inset-0 z-40 flex items-center justify-center">
-    <div class="absolute inset-0 bg-black/80" (click)="closeAddModal()"></div>
-
-    <div
-      class="relative z-50 w-full max-w-xl rounded-2xl border border-monokai-border bg-monokai-surface-highlight/95 p-6 shadow-monokai text-monokai-text"
-      (click)="$event.stopPropagation()"
+  <div
+    class="relative z-50 w-full max-w-xl rounded-2xl border border-monokai-border bg-monokai-surface-highlight/95 p-6 shadow-monokai text-monokai-text"
+    (click)="$event.stopPropagation()"
+  >
+    <button
+      type="button"
+      class="absolute right-4 top-4 text-2xl leading-none text-monokai-muted transition hover:text-monokai-accent"
+      (click)="closeAddModal()"
+      aria-label="Fermer la modale"
     >
-      <button
-        type="button"
-        class="absolute right-4 top-4 text-2xl leading-none text-monokai-muted transition hover:text-monokai-accent"
-        (click)="closeAddModal()"
-        aria-label="Fermer la modale"
-      >
-        ×
-      </button>
+      ×
+    </button>
 
-      <div class="space-y-5">
-        <div class="space-y-1">
-          <p class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Ajouter à votre liste</p>
-          <h2 class="text-2xl font-semibold text-monokai-green">
-            {{ selectedMovie()?.primaryTitle || selectedMovie()?.originalTitle }}
-          </h2>
+    <div class="space-y-5">
+      <div class="space-y-1">
+        <p class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Ajouter à votre liste</p>
+        <h2 class="text-2xl font-semibold text-monokai-green">
+          {{ selectedMovie()?.primaryTitle || selectedMovie()?.originalTitle }}
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-monokai-muted">Note</label>
+          <app-rating-stars
+            [(rating)]="modalRating"
+            [size]="36"
+            [inactiveColor]="'#3f3b3b'"
+            [activeColor]="'#FEEC40'"
+            [strokeColor]="'#BEA62D'"
+            [readonly]="submitting()"
+          ></app-rating-stars>
+          <p class="text-xs text-monokai-muted">
+            Note en pas de 0,5 étoile. Re-cliquez pour retirer la note.
+          </p>
         </div>
 
-        <div class="space-y-4">
-          <div class="space-y-2">
-            <label class="block text-sm font-medium text-monokai-muted">Note</label>
-            <app-rating-stars
-              [(rating)]="modalRating"
-              [size]="36"
-              [inactiveColor]="'#3f3b3b'"
-              [activeColor]="'#FEEC40'"
-              [strokeColor]="'#BEA62D'"
-              [readonly]="submitting()"
-            ></app-rating-stars>
-            <p class="text-xs text-monokai-muted">Note en pas de 0,5 étoile. Re-cliquez pour retirer la note.</p>
-          </div>
-
-          <div class="space-y-2">
-            <label class="block text-sm font-medium text-monokai-muted" for="userReview">Critique</label>
-            <textarea
-              id="userReview"
-              class="block w-full rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-sm text-monokai-text focus:border-monokai-accent focus:outline-none focus:ring-1 focus:ring-monokai-accent"
-              rows="5"
-              placeholder="Partagez votre avis sur ce film"
-              [formControl]="reviewControl"
-              [readonly]="submitting()"
-            ></textarea>
-          </div>
-
-          @if (submissionError()) {
-            <p class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-              {{ submissionError() }}
-            </p>
-          }
-        </div>
-
-        <div class="flex flex-wrap items-center justify-end gap-3">
-          <button
-            type="button"
-            class="rounded-lg border border-monokai-border bg-transparent px-4 py-2 text-sm font-medium text-monokai-muted transition hover:text-monokai-text"
-            (click)="closeAddModal()"
-            [disabled]="submitting()"
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-monokai-muted" for="userReview"
+            >Critique</label
           >
-            Annuler
-          </button>
-          <button
-            type="button"
-            class="flex items-center gap-2 rounded-lg bg-monokai-green px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
-            (click)="submitAddMovie()"
-            [disabled]="submitting()"
-          >
-            @if (submitting()) {
-              <span class="h-4 w-4 animate-spin rounded-full border-2 border-monokai-background border-t-transparent"></span>
-            }
-            Ajouter
-          </button>
+          <textarea
+            id="userReview"
+            class="block w-full rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-sm text-monokai-text focus:border-monokai-accent focus:outline-none focus:ring-1 focus:ring-monokai-accent"
+            rows="5"
+            placeholder="Partagez votre avis sur ce film"
+            [formControl]="reviewControl"
+            [readonly]="submitting()"
+          ></textarea>
         </div>
+
+        @if (submissionError()) {
+        <p class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          {{ submissionError() }}
+        </p>
+        }
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-3">
+        <button
+          type="button"
+          class="rounded-lg border border-monokai-border bg-transparent px-4 py-2 text-sm font-medium text-monokai-muted transition hover:text-monokai-text"
+          (click)="closeAddModal()"
+          [disabled]="submitting()"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-lg bg-monokai-green px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
+          (click)="submitAddMovie()"
+          [disabled]="submitting()"
+        >
+          @if (submitting()) {
+          <span
+            class="h-4 w-4 animate-spin rounded-full border-2 border-monokai-background border-t-transparent"
+          ></span>
+          } Ajouter
+        </button>
       </div>
     </div>
   </div>
+</div>
 }
