@@ -1,0 +1,73 @@
+@if (loading) {
+<div
+  class="flex items-center justify-center gap-3 rounded-lg border border-dashed border-monokai-border bg-monokai-surface-highlight/60 py-6 text-monokai-muted"
+>
+  <div
+    class="h-8 w-8 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"
+  ></div>
+  <span>Chargement de vos films...</span>
+</div>
+} @if (!loading && userMovies.length === 0) {
+<div
+  class="rounded-lg border border-dashed border-monokai-border bg-monokai-surface-highlight/60 p-6 text-center text-sm text-monokai-muted"
+>
+  <p>Aucun film dans votre liste.</p>
+</div>
+} @if (userMovies.length > 0) {
+<ul class="space-y-4">
+  @for (um of userMovies; track um.movieId) {
+  <li
+    class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow transition hover:shadow-monokai"
+  >
+    <div class="flex items-center justify-between">
+      <div class="space-y-1">
+        <h3 class="text-lg font-semibold text-monokai-text">{{ um.movieTitle }}</h3>
+        <div class="mt-1 flex items-center gap-2">
+          <span class="text-sm text-monokai-muted">Votre note:</span>
+          <app-rating-stars
+            [rating]="um.rating ?? 0"
+            [readonly]="true"
+            [size]="20"
+          ></app-rating-stars>
+          <span class="text-sm text-monokai-yellow">{{ um.rating ?? '—' }}/5</span>
+        </div>
+      </div>
+
+      @if (canToggleReview) {
+      <div class="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:bg-monokai-green hover:text-monokai-background"
+          (click)="onToggleReview(um.movieId)"
+        >
+          Voir votre review
+        </button>
+        <button
+          class="px-3 py-2 text-sm bg-monokai-accent rounded-lg text-monokai-background transition hover:bg-monokai-yellow"
+          type="button"
+          (click)="onViewInformation(um)"
+        >
+          Informations
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border border-red-500/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
+          (click)="onDeleteMovie(um)"
+        >
+          Supprimer
+        </button>
+      </div>
+      }
+    </div>
+
+    @if (reviewOpen[um.movieId]) {
+    <div
+      class="mt-3 rounded-lg border border-monokai-border bg-monokai-surface p-4 text-sm text-monokai-text"
+    >
+      {{ um.review || 'Aucune critique rédigée.' }}
+    </div>
+    }
+  </li>
+  }
+</ul>
+}

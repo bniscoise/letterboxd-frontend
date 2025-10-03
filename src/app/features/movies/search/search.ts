@@ -6,11 +6,22 @@ import { MovieService, MovieDto } from '../../../core/services/movie.service';
 import { RatingStarsComponent } from '../../../shared/ui/rating-stars/rating-stars.component';
 import { UserMovieDto, UserMovieService } from '../../../core/services/user-movie.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { MovieResultsComponent } from './components/movie-results/movie-results.component';
+import { UserMovieListComponent } from './components/user-movie-list/user-movie-list.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RatingStarsComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RatingStarsComponent,
+    SearchBarComponent,
+    MovieResultsComponent,
+    UserMovieListComponent
+  ],
   templateUrl: './search.component.html'
 })
 export class SearchComponent {
@@ -49,6 +60,7 @@ export class SearchComponent {
   private movieService = inject(MovieService);
   private userMovieService = inject(UserMovieService);
   public authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor() {
     this.queryControl.valueChanges
@@ -78,31 +90,62 @@ export class SearchComponent {
   }
 
   openUserMovies() {
-  const user = this.authService.user();
-  if (!user) return; 
-  this.loading.set(true);
-  this.userMovieService.getUserMovies(user.id, user.token)
-    .pipe(finalize(() => this.loading.set(false)))
-    .subscribe({
-      next: list => { this.userMovies.set(list ?? []); this.isUserListOpen.set(true); },
-      error: () => { this.userMovies.set([]); this.isUserListOpen.set(true); }
-    });
-}
+    const user = this.authService.user();
+    if (!user) {
+      return;
+    }
 
-closeUserMovies() {
-  this.isUserListOpen.set(false);
-}
-
-toggleReview(movieId: number) {
-  const map = { ...this.reviewOpen() };
-  map[movieId] = !map[movieId];
-  this.reviewOpen.set(map);
-}
-
-
-  trackById(index: number, movie: MovieDto) {
-    return movie.id;
+    this.loading.set(true);
+    this.userMovieService
+      .getUserMovies(user.id, user.token)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: list => {
+          this.userMovies.set(list ?? []);
+          this.isUserListOpen.set(true);
+        },
+        error: () => {
+          this.userMovies.set([]);
+          this.isUserListOpen.set(true);
+        }
+      });
   }
+  deleteUserMovie(userMovie: UserMovieDto) {
+    const user = this.authService.user();
+    if (!user) {
+      return;
+    }
+
+    this.loading.set(true);
+    this.userMovieService
+      .deleteUserMovie(user.id, userMovie.movieId, user.token)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.userMovies.update(list =>
+            list.filter(movie => movie.movieId !== userMovie.movieId)
+          );
+
+          this.reviewOpen.update(map => {
+            const next = { ...map };
+            delete next[userMovie.movieId];
+            return next;
+          });
+        },
+        error: () => {}
+      });
+  }
+
+  closeUserMovies() {
+    this.isUserListOpen.set(false);
+  }
+
+  toggleReview(movieId: number) {
+    const map = { ...this.reviewOpen() };
+    map[movieId] = !map[movieId];
+    this.reviewOpen.set(map);
+  }
+
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
@@ -129,6 +172,52 @@ toggleReview(movieId: number) {
     this.modalRating = 0;
     this.reviewControl.reset('');
     this.isAddModalOpen.set(true);
+  }
+
+  viewMovieInformation(movie: MovieDto) {
+    const movieId = movie.id;
+    if (movieId == null) {
+      return;
+    }
+
+    this.router.navigate(['informations', movieId], {
+      state: { movie }
+    });
+  }
+
+  viewUserMovieInformation(userMovie: UserMovieDto) {
+    const movieId = userMovie.movieId;
+    if (movieId == null) {
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.movieService
+      .getMovieById(movieId)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: movie => {
+          const payload = movie ?? {
+            id: movieId,
+            primaryTitle: userMovie.movieTitle
+          };
+
+          this.router.navigate(['informations', movieId], {
+            state: { movie: payload }
+          });
+        },
+        error: () => {
+          const fallback: MovieDto = {
+            id: movieId,
+            primaryTitle: userMovie.movieTitle
+          };
+
+          this.router.navigate(['informations', movieId], {
+            state: { movie: fallback }
+          });
+        }
+      });
   }
 
   closeAddModal(force = false) {
