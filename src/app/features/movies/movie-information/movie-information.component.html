@@ -60,6 +60,14 @@
       </div>
     </div>
   </div>
+  <div class="mt-8 space-y-4">
+    <app-movie-review-list
+      [reviews]="reviews()"
+      [loading]="loadingReviews()"
+      [error]="loadError()"
+    ></app-movie-review-list>
+  </div>
+
   } @else {
   <div
     class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-6 text-monokai-text"

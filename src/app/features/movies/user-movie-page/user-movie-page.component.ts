@@ -22,7 +22,7 @@ export class UserMoviePageComponent {
 
   private readonly route = inject(ActivatedRoute);
   private readonly userMovieService = inject(UserMovieService);
-  private readonly authService = inject(AuthService);
+  public readonly authService = inject(AuthService);
   private readonly pagination = inject(PaginationService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -220,5 +220,13 @@ export class UserMoviePageComponent {
       id: movieId,
       primaryTitle: userMovie.movieTitle
     };
+  }
+
+  onOpenUserMovies(){
+    const user = this.authService.user();
+      if (!user) {
+        return;
+      }
+      this.router.navigate(['/user', user.id]);
   }
 }
