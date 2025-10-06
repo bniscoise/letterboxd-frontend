@@ -21,12 +21,19 @@
 @if (isUserListOpen()) {
 <app-user-movie-list
   [userMovies]="userMovies()"
+  [pagedUserMovies]="pagedUserMovies()"
   [loading]="loading()"
   [reviewOpen]="reviewOpen()"
   [canToggleReview]="authService.isAuthenticated()"
+  [currentPage]="userCurrentPage()"
+  [totalPages]="userTotalPages()"
+  [pageNumbers]="userPageNumbers()"
   (reviewToggle)="toggleReview($event)"
   (viewInformation)="viewUserMovieInformation($event)"
   (deleteUserMovie)="deleteUserMovie($event)"
+  (previousPage)="userPreviousPage()"
+  (nextPage)="userNextPage()"
+  (goToPage)="userGoToPage($event)"
 ></app-user-movie-list>
 } @if (!isUserListOpen()) {
 <app-search-bar [control]="queryControl"></app-search-bar>

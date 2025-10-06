@@ -15,7 +15,7 @@
 </div>
 } @if (userMovies.length > 0) {
 <ul class="space-y-4">
-  @for (um of userMovies; track um.movieId) {
+  @for (um of pagedUserMovies; track um.movieId) {
   <li
     class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow transition hover:shadow-monokai"
   >
@@ -70,4 +70,40 @@
   </li>
   }
 </ul>
+
+@if (totalPages > 1) {
+<nav class="mt-6 flex items-center justify-center gap-3 text-sm">
+  <button
+    class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-monokai-muted transition hover:text-monokai-text disabled:cursor-not-allowed disabled:opacity-50"
+    (click)="onPreviousPage()"
+    [disabled]="currentPage === 1"
+  >
+    Précédent
+  </button>
+
+  <div class="flex items-center gap-2">
+    @for (page of pageNumbers; track $index) {
+    <button
+      class="min-w-[2.5rem] rounded-lg px-3 py-2 text-center transition"
+      [ngClass]="{
+        'bg-monokai-accent text-monokai-background shadow-monokai': page === currentPage,
+        'border border-monokai-border bg-monokai-surface text-monokai-muted hover:text-monokai-text':
+          page !== currentPage
+      }"
+      (click)="onGoToPage(page)"
+    >
+      {{ page }}
+    </button>
+    }
+  </div>
+
+  <button
+    class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-monokai-muted transition hover:text-monokai-text disabled:cursor-not-allowed disabled:opacity-50"
+    (click)="onNextPage()"
+    [disabled]="currentPage === totalPages"
+  >
+    Suivant
+  </button>
+</nav>
+}
 }
