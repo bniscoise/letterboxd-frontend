@@ -169,6 +169,7 @@ export class SearchComponent {
   }
 
 
+
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
