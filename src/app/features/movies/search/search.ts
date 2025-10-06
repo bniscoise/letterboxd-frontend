@@ -43,6 +43,20 @@ export class SearchComponent {
   isUserListOpen = signal(false);
   userMovies = signal<UserMovieDto[]>([]);
   reviewOpen = signal<Record<number, boolean>>({});
+  userCurrentPage = signal(1);
+
+  pagedUserMovies = computed(() => {
+    const start = (this.userCurrentPage() - 1) * this.PAGE_SIZE;
+    return this.userMovies().slice(start, start + this.PAGE_SIZE);
+  });
+
+  userTotalPages = computed(() => {
+    return Math.max(1, Math.ceil(this.userMovies().length / this.PAGE_SIZE));
+  });
+
+  userPageNumbers = computed(() => {
+    return Array.from({ length: this.userTotalPages() }, (_, index) => index + 1);
+  });
 
   pagedMovies = computed(() => {
     const start = (this.currentPage() - 1) * this.PAGE_SIZE;
@@ -102,10 +116,12 @@ export class SearchComponent {
       .subscribe({
         next: list => {
           this.userMovies.set(list ?? []);
+          this.userCurrentPage.set(1);
           this.isUserListOpen.set(true);
         },
         error: () => {
           this.userMovies.set([]);
+          this.userCurrentPage.set(1);
           this.isUserListOpen.set(true);
         }
       });
@@ -122,9 +138,15 @@ export class SearchComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => {
-          this.userMovies.update(list =>
-            list.filter(movie => movie.movieId !== userMovie.movieId)
-          );
+          this.userMovies.update(list => {
+            const nextList = list.filter(movie => movie.movieId !== userMovie.movieId);
+            const maxPage = Math.max(1, Math.ceil(nextList.length / this.PAGE_SIZE));
+            if (this.userCurrentPage() > maxPage) {
+              this.userCurrentPage.set(maxPage);
+            }
+
+            return nextList;
+          });
 
           this.reviewOpen.update(map => {
             const next = { ...map };
@@ -159,6 +181,21 @@ export class SearchComponent {
 
   nextPage() {
     this.goToPage(this.currentPage() + 1);
+  }
+
+  userGoToPage(page: number) {
+    const total = this.userTotalPages();
+    if (page >= 1 && page <= total) {
+      this.userCurrentPage.set(page);
+    }
+  }
+
+  userPreviousPage() {
+    this.userGoToPage(this.userCurrentPage() - 1);
+  }
+
+  userNextPage() {
+    this.userGoToPage(this.userCurrentPage() + 1);
   }
 
   openAddModal(movie: MovieDto) {
