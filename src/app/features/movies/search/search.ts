@@ -4,12 +4,12 @@ import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap, tap } from 'rxjs';
 import { MovieService, MovieDto } from '../../../core/services/movie.service';
 import { RatingStarsComponent } from '../../../shared/ui/rating-stars/rating-stars.component';
-import { UserMovieDto, UserMovieService } from '../../../core/services/user-movie.service';
+import { UserMovieService } from '../../../core/services/user-movie.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { MovieResultsComponent } from './components/movie-results/movie-results.component';
-import { UserMovieListComponent } from './components/user-movie-list/user-movie-list.component';
 import { Router } from '@angular/router';
+import { PaginationService } from '../../../core/services/pagination.service';
 
 @Component({
   selector: 'app-search',
@@ -19,8 +19,7 @@ import { Router } from '@angular/router';
     ReactiveFormsModule,
     RatingStarsComponent,
     SearchBarComponent,
-    MovieResultsComponent,
-    UserMovieListComponent
+    MovieResultsComponent
   ],
   templateUrl: './search.component.html'
 })
@@ -40,41 +39,23 @@ export class SearchComponent {
   selectedMovie = signal<MovieDto | null>(null);
   modalRating = 0;
   reviewControl = new FormControl('', { nonNullable: true });
-  isUserListOpen = signal(false);
-  userMovies = signal<UserMovieDto[]>([]);
-  reviewOpen = signal<Record<number, boolean>>({});
-  userCurrentPage = signal(1);
-
-  pagedUserMovies = computed(() => {
-    const start = (this.userCurrentPage() - 1) * this.PAGE_SIZE;
-    return this.userMovies().slice(start, start + this.PAGE_SIZE);
-  });
-
-  userTotalPages = computed(() => {
-    return Math.max(1, Math.ceil(this.userMovies().length / this.PAGE_SIZE));
-  });
-
-  userPageNumbers = computed(() => {
-    return Array.from({ length: this.userTotalPages() }, (_, index) => index + 1);
-  });
-
   pagedMovies = computed(() => {
-    const start = (this.currentPage() - 1) * this.PAGE_SIZE;
-    return this.movies().slice(start, start + this.PAGE_SIZE);
+    return this.pagination.paginate(this.movies(), this.currentPage(), this.PAGE_SIZE);
   });
 
   totalPages = computed(() => {
-    return Math.max(1, Math.ceil(this.movies().length / this.PAGE_SIZE));
+    return this.pagination.totalPages(this.movies().length, this.PAGE_SIZE);
   });
 
   pageNumbers = computed(() => {
-    return Array.from({ length: this.totalPages() }, (_, index) => index + 1);
+    return this.pagination.pageNumbers(this.totalPages());
   });
 
   private movieService = inject(MovieService);
-  private userMovieService = inject(UserMovieService);
   public authService = inject(AuthService);
+  private userMovieService = inject(UserMovieService);
   private router = inject(Router);
+  private pagination = inject(PaginationService);
 
   constructor() {
     this.queryControl.valueChanges
@@ -109,63 +90,7 @@ export class SearchComponent {
       return;
     }
 
-    this.loading.set(true);
-    this.userMovieService
-      .getUserMovies(user.id, user.token)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: list => {
-          this.userMovies.set(list ?? []);
-          this.userCurrentPage.set(1);
-          this.isUserListOpen.set(true);
-        },
-        error: () => {
-          this.userMovies.set([]);
-          this.userCurrentPage.set(1);
-          this.isUserListOpen.set(true);
-        }
-      });
-  }
-  deleteUserMovie(userMovie: UserMovieDto) {
-    const user = this.authService.user();
-    if (!user) {
-      return;
-    }
-
-    this.loading.set(true);
-    this.userMovieService
-      .deleteUserMovie(user.id, userMovie.movieId, user.token)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: () => {
-          this.userMovies.update(list => {
-            const nextList = list.filter(movie => movie.movieId !== userMovie.movieId);
-            const maxPage = Math.max(1, Math.ceil(nextList.length / this.PAGE_SIZE));
-            if (this.userCurrentPage() > maxPage) {
-              this.userCurrentPage.set(maxPage);
-            }
-
-            return nextList;
-          });
-
-          this.reviewOpen.update(map => {
-            const next = { ...map };
-            delete next[userMovie.movieId];
-            return next;
-          });
-        },
-        error: () => {}
-      });
-  }
-
-  closeUserMovies() {
-    this.isUserListOpen.set(false);
-  }
-
-  toggleReview(movieId: number) {
-    const map = { ...this.reviewOpen() };
-    map[movieId] = !map[movieId];
-    this.reviewOpen.set(map);
+    this.router.navigate(['/user', user.id]);
   }
 
 
@@ -181,21 +106,6 @@ export class SearchComponent {
 
   nextPage() {
     this.goToPage(this.currentPage() + 1);
-  }
-
-  userGoToPage(page: number) {
-    const total = this.userTotalPages();
-    if (page >= 1 && page <= total) {
-      this.userCurrentPage.set(page);
-    }
-  }
-
-  userPreviousPage() {
-    this.userGoToPage(this.userCurrentPage() - 1);
-  }
-
-  userNextPage() {
-    this.userGoToPage(this.userCurrentPage() + 1);
   }
 
   openAddModal(movie: MovieDto) {
@@ -220,41 +130,6 @@ export class SearchComponent {
     this.router.navigate(['informations', movieId], {
       state: { movie }
     });
-  }
-
-  viewUserMovieInformation(userMovie: UserMovieDto) {
-    const movieId = userMovie.movieId;
-    if (movieId == null) {
-      return;
-    }
-
-    this.loading.set(true);
-
-    this.movieService
-      .getMovieById(movieId)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: movie => {
-          const payload = movie ?? {
-            id: movieId,
-            primaryTitle: userMovie.movieTitle
-          };
-
-          this.router.navigate(['informations', movieId], {
-            state: { movie: payload }
-          });
-        },
-        error: () => {
-          const fallback: MovieDto = {
-            id: movieId,
-            primaryTitle: userMovie.movieTitle
-          };
-
-          this.router.navigate(['informations', movieId], {
-            state: { movie: fallback }
-          });
-        }
-      });
   }
 
   closeAddModal(force = false) {

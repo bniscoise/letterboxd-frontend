@@ -5,13 +5,13 @@
   <div
     class="h-8 w-8 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"
   ></div>
-  <span>Chargement de vos films...</span>
+  <span>Chargement de la liste...</span>
 </div>
 } @if (!loading && userMovies.length === 0) {
 <div
   class="rounded-lg border border-dashed border-monokai-border bg-monokai-surface-highlight/60 p-6 text-center text-sm text-monokai-muted"
 >
-  <p>Aucun film dans votre liste.</p>
+  <p>Aucun film dans cette liste.</p>
 </div>
 } @if (userMovies.length > 0) {
 <ul class="space-y-4">
@@ -23,7 +23,7 @@
       <div class="space-y-1">
         <h3 class="text-lg font-semibold text-monokai-text">{{ um.movieTitle }}</h3>
         <div class="mt-1 flex items-center gap-2">
-          <span class="text-sm text-monokai-muted">Votre note:</span>
+          <span class="text-sm text-monokai-muted">Note :</span>
           <app-rating-stars
             [rating]="um.rating ?? 0"
             [readonly]="true"
@@ -33,15 +33,16 @@
         </div>
       </div>
 
-      @if (canToggleReview) {
       <div class="flex items-center justify-between gap-4">
+        @if (canToggleReview) {
         <button
           type="button"
           class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:bg-monokai-green hover:text-monokai-background"
           (click)="onToggleReview(um.movieId)"
         >
-          Voir votre review
+          {{ reviewButtonLabel }}
         </button>
+        }
         <button
           class="px-3 py-2 text-sm bg-monokai-accent rounded-lg text-monokai-background transition hover:bg-monokai-yellow"
           type="button"
@@ -49,6 +50,7 @@
         >
           Informations
         </button>
+        @if (canDelete) {
         <button
           type="button"
           class="rounded-lg border border-red-500/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
@@ -56,8 +58,8 @@
         >
           Supprimer
         </button>
+        }
       </div>
-      }
     </div>
 
     @if (reviewOpen[um.movieId]) {

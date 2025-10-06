@@ -15,6 +15,8 @@ export class UserMovieListComponent {
   @Input() loading = false;
   @Input() reviewOpen: Record<number, boolean> = {};
   @Input() canToggleReview = false;
+  @Input() canDelete = false;
+  @Input() reviewButtonLabel = 'Voir la review';
   @Input() currentPage = 1;
   @Input() totalPages = 1;
   @Input() pageNumbers: number[] = [];
@@ -34,7 +36,9 @@ export class UserMovieListComponent {
   }
 
   onDeleteMovie(movie: UserMovieDto) {
-    this.deleteUserMovie.emit(movie);
+    if (this.canDelete) {
+      this.deleteUserMovie.emit(movie);
+    }
   }
 
   onPreviousPage() {
