@@ -5,13 +5,13 @@ import { UserMovieDto } from '../../../../../core/services/user-movie.service';
 
 @Component({
   selector: 'app-movie-review-list',
+  standalone: true,
   imports: [CommonModule, RatingStarsComponent],
   templateUrl: './movie-review-list.component.html',
-  styleUrl: './movie-review-list.component.css'
+  styleUrls: ['./movie-review-list.component.css']
 })
 export class MovieReviewListComponent {
-  @Input() reviews: UserMovieDto[] = [];;
-  @Input() loading = false
-  
-
+  @Input() reviews: UserMovieDto[] = [];
+  @Input() loading = false;
+  @Input() error: string | null = null;
 }
