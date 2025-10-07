@@ -20,8 +20,10 @@ export class MovieInformationComponent {
   private readonly userMovieService = inject(UserMovieService);
 
   readonly movieId = Number(this.route.snapshot.paramMap.get('movieId'));
-  readonly movie = (this.router.currentNavigation()?.extras.state?.['movie'] ??
-                  history.state?.['movie']) as MovieDto | undefined ?? null;
+  readonly movie =
+    (this.router.currentNavigation()?.extras.state?.['movie'] ?? history.state?.['movie']) as
+      | MovieDto
+      | undefined ?? null;
 
 
   readonly loadingReviews = signal(true);
