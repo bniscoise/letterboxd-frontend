@@ -9,6 +9,7 @@ export interface UserMovieDto {
   review: string | null;
   userId: number;
   username: string;
+  posterUrl: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

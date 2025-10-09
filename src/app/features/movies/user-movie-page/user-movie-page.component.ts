@@ -218,7 +218,8 @@ export class UserMoviePageComponent {
   private buildFallbackMovie(movieId: number, userMovie: UserMovieDto): MovieDto {
     return {
       id: movieId,
-      primaryTitle: userMovie.movieTitle
+      primaryTitle: userMovie.movieTitle,
+      posterUrl: userMovie.posterUrl ?? undefined
     };
   }
 

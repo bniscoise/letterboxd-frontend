@@ -19,46 +19,67 @@
   <li
     class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow transition hover:shadow-monokai"
   >
-    <div class="flex items-center justify-between">
-      <div class="space-y-1">
-        <h3 class="text-lg font-semibold text-monokai-text">{{ um.movieTitle }}</h3>
-        <div class="mt-1 flex items-center gap-2">
-          <span class="text-sm text-monokai-muted">Note :</span>
-          <app-rating-stars
-            [rating]="um.rating ?? 0"
-            [readonly]="true"
-            [size]="20"
-          ></app-rating-stars>
-          <span class="text-sm text-monokai-yellow">{{ um.rating ?? '—' }}/5</span>
+    <div class="flex items-start gap-4">
+      <div
+        class="h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-monokai-border bg-monokai-surface"
+      >
+        @if (um.posterUrl) {
+        <img
+          [src]="um.posterUrl"
+          [alt]="'Affiche de ' + um.movieTitle"
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
+        } @else {
+        <div
+          class="flex h-full w-full items-center justify-center bg-monokai-surface-highlight text-xs text-monokai-muted"
+        >
+          Affiche indisponible
         </div>
+        }
       </div>
 
-      <div class="flex items-center justify-between gap-4">
-        @if (canToggleReview) {
-        <button
-          type="button"
-          class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:bg-monokai-green hover:text-monokai-background"
-          (click)="onToggleReview(um.movieId)"
-        >
-          {{ reviewButtonLabel }}
-        </button>
-        }
-        <button
-          class="px-3 py-2 text-sm bg-monokai-accent rounded-lg text-monokai-background transition hover:bg-monokai-yellow"
-          type="button"
-          (click)="onViewInformation(um)"
-        >
-          Informations
-        </button>
-        @if (canDelete) {
-        <button
-          type="button"
-          class="rounded-lg border border-red-500/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
-          (click)="onDeleteMovie(um)"
-        >
-          Supprimer
-        </button>
-        }
+      <div class="flex flex-1 flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div class="space-y-1">
+          <h3 class="text-lg font-semibold text-monokai-text">{{ um.movieTitle }}</h3>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="text-sm text-monokai-muted">Note :</span>
+            <app-rating-stars
+              [rating]="um.rating ?? 0"
+              [readonly]="true"
+              [size]="20"
+            ></app-rating-stars>
+            <span class="text-sm text-monokai-yellow">{{ um.rating ?? '—' }}/5</span>
+          </div>
+        </div>
+        
+        <div class="flex flex-wrap items-center justify-end gap-3">
+          @if (canToggleReview) {
+          <button
+            type="button"
+            class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:bg-monokai-green hover:text-monokai-background"
+            (click)="onToggleReview(um.movieId)"
+          >
+            {{ reviewButtonLabel }}
+          </button>
+          }
+          <button
+            class="rounded-lg bg-monokai-accent px-3 py-2 text-sm text-monokai-background transition hover:bg-monokai-yellow"
+            type="button"
+            (click)="onViewInformation(um)"
+          >
+            Informations
+          </button>
+          @if (canDelete) {
+          <button
+            type="button"
+            class="rounded-lg border border-red-500/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
+            (click)="onDeleteMovie(um)"
+          >
+            Supprimer
+          </button>
+          }
+        </div>
       </div>
     </div>
 
