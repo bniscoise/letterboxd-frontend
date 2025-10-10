@@ -1,7 +1,7 @@
 <div class="space-y-6">
   <div class="space-y-2">
     <p class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Informations du film</p>
-    <h1 class="text-3xl font-semibold text-monokai-green">
+    <h1 class="text-3xl font-semibold text-monokai-bold">
       @if (movie) {
       {{ movie.primaryTitle }}
       } @else { Film introuvable }
@@ -41,16 +41,33 @@
       <p class="text-sm text-monokai-muted">Titre original: {{ movie.originalTitle }}</p>
       }
 
-      <div class="pt-4">
+      <div class="pt-4 flex justify-between items-center">
         <a
           class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
           routerLink="/search"
         >
           ← Retour à la recherche
         </a>
+        @if (isAuthenticated()) {
+        <button
+          type="button"
+          class="rounded-lg bg-monokai-accent px-3 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
+          (click)="onOpenUserMovies()"
+        >
+          Retour à ma liste
+        </button>
+        }
       </div>
     </div>
   </div>
+  <div class="mt-8 space-y-4">
+    <app-movie-review-list
+      [reviews]="reviews()"
+      [loading]="loadingReviews()"
+      [error]="loadError()"
+    ></app-movie-review-list>
+  </div>
+
   } @else {
   <div
     class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-6 text-monokai-text"

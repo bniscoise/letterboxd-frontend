@@ -7,6 +7,9 @@ export interface UserMovieDto {
   movieTitle: string;
   rating: number | null;
   review: string | null;
+  userId: number;
+  username: string;
+  posterUrl: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -51,5 +54,9 @@ export class UserMovieService {
       : undefined;
 
     return this.http.delete<void>(`${this.baseUrl}/${userId}/${movieId}`, { headers });
+  }
+
+  getMovieReviews(movieId: number): Observable<UserMovieDto[]>{
+    return this.http.get<UserMovieDto[]>(`${this.baseUrl}/movie/${movieId}`);
   }
 }

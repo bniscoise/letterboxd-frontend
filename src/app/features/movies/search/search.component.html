@@ -7,35 +7,9 @@
   >
     Mes films
   </button>
-  } @if (isUserListOpen()) {
-  <button
-    type="button"
-    class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 text-sm transition hover:text-monokai-text"
-    (click)="closeUserMovies()"
-  >
-    Retour à la recherche
-  </button>
   }
 </div>
 
-@if (isUserListOpen()) {
-<app-user-movie-list
-  [userMovies]="userMovies()"
-  [pagedUserMovies]="pagedUserMovies()"
-  [loading]="loading()"
-  [reviewOpen]="reviewOpen()"
-  [canToggleReview]="authService.isAuthenticated()"
-  [currentPage]="userCurrentPage()"
-  [totalPages]="userTotalPages()"
-  [pageNumbers]="userPageNumbers()"
-  (reviewToggle)="toggleReview($event)"
-  (viewInformation)="viewUserMovieInformation($event)"
-  (deleteUserMovie)="deleteUserMovie($event)"
-  (previousPage)="userPreviousPage()"
-  (nextPage)="userNextPage()"
-  (goToPage)="userGoToPage($event)"
-></app-user-movie-list>
-} @if (!isUserListOpen()) {
 <app-search-bar [control]="queryControl"></app-search-bar>
 
 <app-movie-results
@@ -53,7 +27,7 @@
   (goToPage)="goToPage($event)"
   (viewInformation)="viewMovieInformation($event)"
 ></app-movie-results>
-} @if (isAddModalOpen()) {
+@if (isAddModalOpen()) {
 <div class="fixed inset-0 z-40 flex items-center justify-center">
   <div class="absolute inset-0 bg-black/80" (click)="closeAddModal()"></div>
 
