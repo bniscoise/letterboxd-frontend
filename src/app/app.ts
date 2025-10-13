@@ -20,7 +20,9 @@ import { AuthService, LoginPayload, RegisterPayload } from './core/services/auth
           (logout)="onLogout()"
         ></app-auth-modal>
 
-        <section class="rounded-xl border border-monokai-border bg-monokai-surfaceHighlight/80 p-6 shadow-monokai">
+        <section
+          class="rounded-xl border border-monokai-border bg-monokai-surfaceHighlight/80 p-6 shadow-monokai"
+        >
           <router-outlet></router-outlet>
         </section>
       </div>

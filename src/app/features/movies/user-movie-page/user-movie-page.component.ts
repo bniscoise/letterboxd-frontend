@@ -6,7 +6,10 @@ import { catchError, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { UserMovieDto, UserMovieService } from '../../../core/services/user-movie.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PaginationService } from '../../../core/services/pagination.service';
-import { UserMovieListComponent } from '../search/components/user-movie-list/user-movie-list.component';
+import {
+  UserMovieListComponent,
+  UserMovieSort,
+} from '../search/components/user-movie-list/user-movie-list.component';
 import { MovieDto, MovieService } from '../../../core/services/movie.service';
 import { UserService } from '../../../core/services/user.service';
 
@@ -15,7 +18,7 @@ import { UserService } from '../../../core/services/user.service';
   standalone: true,
   imports: [CommonModule, RouterModule, UserMovieListComponent],
   templateUrl: './user-movie-page.component.html',
-  styleUrls: ['./user-movie-page.component.css']
+  styleUrls: ['./user-movie-page.component.css'],
 })
 export class UserMoviePageComponent {
   private readonly PAGE_SIZE = 10;
@@ -36,6 +39,7 @@ export class UserMoviePageComponent {
   readonly reviewOpen = signal<Record<number, boolean>>({});
   readonly viewingUserId = signal<number | null>(null);
   readonly viewingUsername = signal<string | null>(null);
+  readonly sortMode = signal<UserMovieSort>(UserMovieSort.Original);
 
   readonly isOwner = computed(() => {
     const authUser = this.authService.user();
@@ -44,31 +48,58 @@ export class UserMoviePageComponent {
   });
 
   readonly canToggleReview = computed(() =>
-    this.userMovies().some(movie => (movie.review ?? '').trim().length > 0)
+    this.userMovies().some((movie) => (movie.review ?? '').trim().length > 0),
   );
 
   readonly reviewButtonLabel = computed(() =>
-    this.isOwner() ? 'Voir votre review' : 'Voir la review'
+    this.isOwner() ? 'Voir votre review' : 'Voir la review',
   );
 
+  readonly sortedUserMovies = computed(() => {
+    const movies = this.userMovies();
+    const mode = this.sortMode();
+
+    if (!movies.length || mode === UserMovieSort.Original) {
+      return movies;
+    }
+
+    const clone = [...movies];
+
+    if (mode === UserMovieSort.RatingAsc) {
+      return clone.sort((a, b) => {
+        const ratingA = typeof a.rating === 'number' ? a.rating : Number.POSITIVE_INFINITY;
+        const ratingB = typeof b.rating === 'number' ? b.rating : Number.POSITIVE_INFINITY;
+        return ratingA - ratingB;
+      });
+    }
+
+    if (mode === UserMovieSort.RatingDesc) {
+      return clone.sort((a, b) => {
+        const ratingA = typeof a.rating === 'number' ? a.rating : Number.NEGATIVE_INFINITY;
+        const ratingB = typeof b.rating === 'number' ? b.rating : Number.NEGATIVE_INFINITY;
+        return ratingB - ratingA;
+      });
+    }
+
+    return clone;
+  });
+
   readonly pagedUserMovies = computed(() =>
-    this.pagination.paginate(this.userMovies(), this.currentPage(), this.PAGE_SIZE)
+    this.pagination.paginate(this.sortedUserMovies(), this.currentPage(), this.PAGE_SIZE),
   );
 
   readonly totalPages = computed(() =>
-    this.pagination.totalPages(this.userMovies().length, this.PAGE_SIZE)
+    this.pagination.totalPages(this.sortedUserMovies().length, this.PAGE_SIZE),
   );
 
-  readonly pageNumbers = computed(() =>
-    this.pagination.pageNumbers(this.totalPages())
-  );
+  readonly pageNumbers = computed(() => this.pagination.pageNumbers(this.totalPages()));
 
   constructor() {
     this.route.paramMap
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        map(params => Number(params.get('userId'))),
-        tap(userId => {
+        map((params) => Number(params.get('userId'))),
+        tap((userId) => {
           if (!Number.isFinite(userId)) {
             this.error.set('Utilisateur introuvable.');
             this.userMovies.set([]);
@@ -76,7 +107,7 @@ export class UserMoviePageComponent {
             this.viewingUsername.set(null);
           }
         }),
-        switchMap(userId => {
+        switchMap((userId) => {
           if (!Number.isFinite(userId)) {
             return of<{ list: UserMovieDto[]; username: string | null } | null>(null);
           }
@@ -91,20 +122,20 @@ export class UserMoviePageComponent {
             catchError(() => {
               this.error.set('Impossible de récupérer cette liste.');
               return of<UserMovieDto[]>([]);
-            })
+            }),
           );
 
           const user$ = this.userService.getUserById(safeId).pipe(
-            map(user => user.username),
-            catchError(() => of<string | null>(null))
+            map((user) => user.username),
+            catchError(() => of<string | null>(null)),
           );
 
           return forkJoin({ list: list$, username: user$ }).pipe(
-            finalize(() => this.loading.set(false))
+            finalize(() => this.loading.set(false)),
           );
-        })
+        }),
       )
-      .subscribe(result => {
+      .subscribe((result) => {
         if (result === null) {
           return;
         }
@@ -114,6 +145,7 @@ export class UserMoviePageComponent {
         this.viewingUsername.set(username);
         this.userMovies.set(list ?? []);
         this.reviewOpen.set({});
+        this.sortMode.set(UserMovieSort.Original);
         this.currentPage.set(1);
         this.syncCurrentPage();
       });
@@ -140,6 +172,11 @@ export class UserMoviePageComponent {
     this.goToPage(this.currentPage() + 1);
   }
 
+  onSortChange(mode: UserMovieSort) {
+    this.sortMode.set(mode);
+    this.currentPage.set(1);
+  }
+
   deleteUserMovie(userMovie: UserMovieDto) {
     if (!this.isOwner()) {
       return;
@@ -156,9 +193,11 @@ export class UserMoviePageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => {
-          this.userMovies.update(list => list.filter(movie => movie.movieId !== userMovie.movieId));
+          this.userMovies.update((list) =>
+            list.filter((movie) => movie.movieId !== userMovie.movieId),
+          );
 
-          this.reviewOpen.update(map => {
+          this.reviewOpen.update((map) => {
             const copy = { ...map };
             delete copy[userMovie.movieId];
             return copy;
@@ -169,7 +208,7 @@ export class UserMoviePageComponent {
         },
         error: () => {
           this.error.set('Impossible de supprimer ce film pour le moment.');
-        }
+        },
       });
   }
 
@@ -185,17 +224,17 @@ export class UserMoviePageComponent {
       .getMovieById(movieId)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: movie => {
+        next: (movie) => {
           const payload = movie ?? this.buildFallbackMovie(movieId, userMovie);
           this.router.navigate(['informations', movieId], {
-            state: { movie: payload }
+            state: { movie: payload },
           });
         },
         error: () => {
           this.router.navigate(['informations', movieId], {
-            state: { movie: this.buildFallbackMovie(movieId, userMovie) }
+            state: { movie: this.buildFallbackMovie(movieId, userMovie) },
           });
-        }
+        },
       });
   }
 
@@ -206,8 +245,8 @@ export class UserMoviePageComponent {
   private syncCurrentPage() {
     const adjusted = this.pagination.clampPage(
       this.currentPage(),
-      this.userMovies().length,
-      this.PAGE_SIZE
+      this.sortedUserMovies().length,
+      this.PAGE_SIZE,
     );
 
     if (adjusted !== this.currentPage()) {
@@ -219,15 +258,15 @@ export class UserMoviePageComponent {
     return {
       id: movieId,
       primaryTitle: userMovie.movieTitle,
-      posterUrl: userMovie.posterUrl ?? undefined
+      posterUrl: userMovie.posterUrl ?? undefined,
     };
   }
 
-  onOpenUserMovies(){
+  onOpenUserMovies() {
     const user = this.authService.user();
-      if (!user) {
-        return;
-      }
-      this.router.navigate(['/user', user.id]);
+    if (!user) {
+      return;
+    }
+    this.router.navigate(['/user', user.id]);
   }
 }
