@@ -1,7 +1,20 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RatingStarsComponent } from '../../../../../shared/ui/rating-stars/rating-stars.component';
 import { UserMovieDto } from '../../../../../core/services/user-movie.service';
+
+export enum UserMovieSort {
+  Original = 'original',
+  RatingAsc = 'ratingAsc',
+  RatingDesc = 'ratingDesc'
+}
 
 @Component({
   selector: 'app-user-movie-list',
@@ -9,7 +22,7 @@ import { UserMovieDto } from '../../../../../core/services/user-movie.service';
   imports: [CommonModule, RatingStarsComponent],
   templateUrl: './user-movie-list.component.html'
 })
-export class UserMovieListComponent {
+export class UserMovieListComponent implements OnChanges {
   @Input({ required: true }) userMovies: UserMovieDto[] = [];
   @Input({ required: true }) pagedUserMovies: UserMovieDto[] = [];
   @Input() loading = false;
@@ -20,6 +33,7 @@ export class UserMovieListComponent {
   @Input() currentPage = 1;
   @Input() totalPages = 1;
   @Input() pageNumbers: number[] = [];
+  @Input() sortMode: UserMovieSort = UserMovieSort.Original;
 
   @Output() readonly reviewToggle = new EventEmitter<number>();
   @Output() readonly viewInformation = new EventEmitter<UserMovieDto>();
@@ -27,6 +41,29 @@ export class UserMovieListComponent {
   @Output() readonly previousPage = new EventEmitter<void>();
   @Output() readonly nextPage = new EventEmitter<void>();
   @Output() readonly goToPage = new EventEmitter<number>();
+  @Output() readonly sortChange = new EventEmitter<UserMovieSort>();
+
+  readonly UserMovieSort = UserMovieSort;
+
+  displayedPagedMovies: UserMovieDto[] = [];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['pagedUserMovies']) {
+      this.displayedPagedMovies = [...(this.pagedUserMovies ?? [])];
+    }
+
+    if (changes['userMovies'] && !changes['pagedUserMovies']) {
+      this.displayedPagedMovies = [...(this.pagedUserMovies ?? [])];
+    }
+  }
+
+  onSortChange(mode: UserMovieSort): void {
+    if (this.sortMode === mode) {
+      return;
+    }
+
+    this.sortChange.emit(mode);
+  }
 
   onToggleReview(movieId: number) {
     this.reviewToggle.emit(movieId);

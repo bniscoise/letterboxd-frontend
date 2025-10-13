@@ -49,12 +49,14 @@
     [currentPage]="currentPage()"
     [totalPages]="totalPages()"
     [pageNumbers]="pageNumbers()"
+    [sortMode]="sortMode()"
     (reviewToggle)="toggleReview($event)"
     (viewInformation)="viewUserMovieInformation($event)"
     (deleteUserMovie)="deleteUserMovie($event)"
     (previousPage)="previousPage()"
     (nextPage)="nextPage()"
     (goToPage)="goToPage($event)"
+    (sortChange)="onSortChange($event)"
   ></app-user-movie-list>
 
   @if (!isOwner() && viewingUserId() !== null) {
