@@ -3,87 +3,107 @@
     <p class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Informations du film</p>
     <h1 class="text-3xl font-semibold text-monokai-bold">
       @if (movie) {
-      {{ movie.primaryTitle }}
-      } @else { Film introuvable }
+        {{ movie.primaryTitle }}
+      } @else {
+        Film introuvable
+      }
     </h1>
   </div>
 
   @if (movie) {
-  <div
-    class="flex flex-col gap-6 rounded-xl border border-monokai-border bg-monokai-surface-highlight/80 p-6 shadow-monokai sm:flex-row"
-  >
-    @if (movie.posterUrl) {
-    <img
-      [src]="movie.posterUrl"
-      width="200"
-      height="300"
-      [alt]="movie.primaryTitle"
-      class="h-[300px] w-[200px] rounded object-cover shadow-inner"
-    />
-    } @else {
     <div
-      class="flex h-[300px] w-[200px] items-center justify-center rounded border border-monokai-border bg-monokai-surface"
+      class="flex flex-col gap-6 rounded-xl border border-monokai-border bg-monokai-surface-highlight/80 p-6 shadow-monokai sm:flex-row"
     >
-      <span class="text-center text-sm text-monokai-muted">Pas d'image</span>
-    </div>
-    }
-
-    <div class="flex-1 space-y-4">
-      @if (movie.aggregateRating !== undefined) {
-      <p class="text-lg font-medium text-monokai-yellow">
-        ⭐ {{ movie.aggregateRating }}/10 @if (movie.voteCount) {
-        <span class="ml-1 text-sm text-monokai-muted">({{ movie.voteCount }} votes)</span>
-        }
-      </p>
-      } @if (movie.startYear) {
-      <p class="text-sm text-monokai-text">Sortie: {{ movie.startYear }}</p>
-      } @if (movie.originalTitle && movie.originalTitle !== movie.primaryTitle) {
-      <p class="text-sm text-monokai-muted">Titre original: {{ movie.originalTitle }}</p>
+      @if (movie.posterUrl) {
+        <img
+          [src]="movie.posterUrl"
+          width="200"
+          height="300"
+          [alt]="movie.primaryTitle"
+          class="h-[300px] w-[200px] rounded object-cover shadow-inner"
+        />
+      } @else {
+        <div
+          class="flex h-[300px] w-[200px] items-center justify-center rounded border border-monokai-border bg-monokai-surface"
+        >
+          <span class="text-center text-sm text-monokai-muted">Pas d'image</span>
+        </div>
       }
 
-      <div class="pt-4 flex justify-between items-center">
+      <div class="flex-1 space-y-4">
+        @if (movie.aggregateRating !== undefined) {
+          <p class="text-lg font-medium text-monokai-yellow">
+            ⭐ {{ movie.aggregateRating }}/10
+            @if (movie.voteCount) {
+              <span class="ml-1 text-sm text-monokai-muted">({{ movie.voteCount }} votes)</span>
+            }
+          </p>
+        }
+        @if (movie.startYear) {
+          <p class="text-sm text-monokai-text">Sortie: {{ movie.startYear }}</p>
+        }
+        @if (movie.originalTitle && movie.originalTitle !== movie.primaryTitle) {
+          <p class="text-sm text-monokai-muted">Titre original: {{ movie.originalTitle }}</p>
+        }
+
+        <div class="pt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <a
+            class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
+            routerLink="/search"
+          >
+            ← Retour à la recherche
+          </a>
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              class="px-3 py-2 text-sm font-semibold bg-monokai-green rounded-lg text-monokai-background transition hover:bg-monokai-yellow hover:text-monokai-background"
+              (click)="openAddModal()"
+            >
+              Ajouter à ma liste
+            </button>
+            @if (isAuthenticated()) {
+              <button
+                type="button"
+                class="rounded-lg bg-monokai-accent px-3 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
+                (click)="onOpenUserMovies()"
+              >
+                Retour à ma liste
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-8 space-y-4">
+      <app-movie-review-list
+        [reviews]="reviews()"
+        [loading]="loadingReviews()"
+        [error]="loadError()"
+      ></app-movie-review-list>
+    </div>
+  } @else {
+    <div
+      class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-6 text-monokai-text"
+    >
+      <p>
+        Impossible de retrouver les informations du film sélectionné. Retournez à la recherche et
+        réessayez.
+      </p>
+      <div class="pt-4">
         <a
           class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
           routerLink="/search"
         >
           ← Retour à la recherche
         </a>
-        @if (isAuthenticated()) {
-        <button
-          type="button"
-          class="rounded-lg bg-monokai-accent px-3 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow"
-          (click)="onOpenUserMovies()"
-        >
-          Retour à ma liste
-        </button>
-        }
       </div>
     </div>
-  </div>
-  <div class="mt-8 space-y-4">
-    <app-movie-review-list
-      [reviews]="reviews()"
-      [loading]="loadingReviews()"
-      [error]="loadError()"
-    ></app-movie-review-list>
-  </div>
-
-  } @else {
-  <div
-    class="rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-6 text-monokai-text"
-  >
-    <p>
-      Impossible de retrouver les informations du film sélectionné. Retournez à la recherche et
-      réessayez.
-    </p>
-    <div class="pt-4">
-      <a
-        class="inline-flex items-center rounded-lg border border-monokai-border px-4 py-2 text-sm text-monokai-muted transition hover:text-monokai-text"
-        routerLink="/search"
-      >
-        ← Retour à la recherche
-      </a>
-    </div>
-  </div>
   }
 </div>
+
+<app-user-movie-add-modal
+  [open]="isAddModalOpen()"
+  [movie]="movie"
+  (closed)="closeAddModal()"
+  (submitted)="handleModalSubmitted()"
+></app-user-movie-add-modal>
