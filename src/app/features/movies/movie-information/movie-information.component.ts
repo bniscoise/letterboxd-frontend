@@ -5,11 +5,17 @@ import { AuthService } from '../../../core/services/auth.service';
 import { UserMovieDto, UserMovieService } from '../../../core/services/user-movie.service';
 import { MovieDto } from '../../../core/services/movie.service';
 import { MovieReviewListComponent } from './components/movie-review-list/movie-review-list.component';
+import { UserMovieAddModalComponent } from '../shared/user-movie-add-modal/user-movie-add-modal.component';
 
 @Component({
   selector: 'app-movie-information',
   standalone: true,
-  imports: [CommonModule, RouterLink, MovieReviewListComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    MovieReviewListComponent,
+    UserMovieAddModalComponent
+  ],
   templateUrl: './movie-information.component.html',
   styleUrl: './movie-information.component.css'
 })
@@ -31,6 +37,7 @@ export class MovieInformationComponent {
   readonly loadError = signal<string | null>(null);
   protected readonly isAuthenticated = this.authService.isAuthenticated;
   protected readonly currentUser = this.authService.user;
+  readonly isAddModalOpen = signal(false);
 
   constructor() {
     // movie déjà récupéré
@@ -40,6 +47,33 @@ export class MovieInformationComponent {
       return;
     }
 
+    this.loadReviews();
+  }
+
+  onOpenUserMovies(): void {
+    const user = this.currentUser();
+    if (!user) {
+      return;
+    }
+    this.router.navigate(['/user', user.id]);
+  }
+
+  openAddModal(): void {
+    this.isAddModalOpen.set(true);
+  }
+
+  closeAddModal(): void {
+    this.isAddModalOpen.set(false);
+  }
+
+  handleModalSubmitted(): void {
+    this.closeAddModal();
+    this.loadReviews();
+  }
+
+  private loadReviews(): void {
+    this.loadingReviews.set(true);
+    this.loadError.set(null);
     this.userMovieService.getMovieReviews(this.movieId).subscribe({
       next: (reviews) => {
         this.reviews.set(reviews);
@@ -50,13 +84,5 @@ export class MovieInformationComponent {
         this.loadingReviews.set(false);
       }
     });
-  }
-
-  onOpenUserMovies(): void {
-    const user = this.currentUser();
-    if (!user) {
-      return;
-    }
-    this.router.navigate(['/user', user.id]);
   }
 }

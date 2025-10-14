@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap, tap } from 'rxjs';
 import { MovieService, MovieDto } from '../../../core/services/movie.service';
-import { RatingStarsComponent } from '../../../shared/ui/rating-stars/rating-stars.component';
-import { UserMovieService } from '../../../core/services/user-movie.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { MovieResultsComponent } from './components/movie-results/movie-results.component';
 import { Router } from '@angular/router';
 import { PaginationService } from '../../../core/services/pagination.service';
+import { UserMovieAddModalComponent } from '../shared/user-movie-add-modal/user-movie-add-modal.component';
 
 @Component({
   selector: 'app-search',
@@ -17,9 +16,9 @@ import { PaginationService } from '../../../core/services/pagination.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RatingStarsComponent,
     SearchBarComponent,
-    MovieResultsComponent
+    MovieResultsComponent,
+    UserMovieAddModalComponent
   ],
   templateUrl: './search.component.html'
 })
@@ -33,12 +32,7 @@ export class SearchComponent {
   searchPerformed = signal(false);
   currentPage = signal(1);
   isAddModalOpen = signal(false);
-  submitting = signal(false);
-  submissionError = signal<string | null>(null);
-
   selectedMovie = signal<MovieDto | null>(null);
-  modalRating = 0;
-  reviewControl = new FormControl('', { nonNullable: true });
   pagedMovies = computed(() => {
     return this.pagination.paginate(this.movies(), this.currentPage(), this.PAGE_SIZE);
   });
@@ -53,7 +47,6 @@ export class SearchComponent {
 
   private movieService = inject(MovieService);
   public authService = inject(AuthService);
-  private userMovieService = inject(UserMovieService);
   private router = inject(Router);
   private pagination = inject(PaginationService);
 
@@ -109,16 +102,17 @@ export class SearchComponent {
   }
 
   openAddModal(movie: MovieDto) {
-    if (!this.authService.isAuthenticated()) {
-      this.submissionError.set('Vous devez être connecté pour ajouter un film à votre liste.');
-    } else {
-      this.submissionError.set(null);
-    }
-
     this.selectedMovie.set(movie);
-    this.modalRating = 0;
-    this.reviewControl.reset('');
     this.isAddModalOpen.set(true);
+  }
+
+  closeAddModal() {
+    this.isAddModalOpen.set(false);
+    this.selectedMovie.set(null);
+  }
+
+  handleModalSubmitted() {
+    this.closeAddModal();
   }
 
   viewMovieInformation(movie: MovieDto) {
@@ -130,60 +124,5 @@ export class SearchComponent {
     this.router.navigate(['informations', movieId], {
       state: { movie }
     });
-  }
-
-  closeAddModal(force = false) {
-    if (!force && this.submitting()) {
-      return;
-    }
-
-    this.isAddModalOpen.set(false);
-    this.selectedMovie.set(null);
-    this.modalRating = 0;
-    this.reviewControl.reset('');
-    this.submissionError.set(null);
-  }
-
-  submitAddMovie() {
-    const movie = this.selectedMovie();
-    const user = this.authService.user();
-
-    if (!movie) {
-      return;
-    }
-
-    if (!user) {
-      this.submissionError.set('Veuillez vous connecter pour ajouter un film.');
-      return;
-    }
-
-    if (this.submitting()) {
-      return;
-    }
-
-    this.submissionError.set(null);
-    this.submitting.set(true);
-
-    const ratingValue = this.modalRating > 0 ? this.modalRating : null;
-    const reviewValue = this.reviewControl.value.trim();
-
-    this.userMovieService
-      .addOrUpdateUserMovie(
-        user.id,
-        movie.id,
-        ratingValue,
-        reviewValue.length > 0 ? reviewValue : null,
-        user.token
-      )
-      .pipe(finalize(() => this.submitting.set(false)))
-      .subscribe({
-        next: () => {
-          this.closeAddModal(true);
-        },
-        error: (error) => {
-          console.error('Failed to add movie for user', error);
-          this.submissionError.set('Une erreur est survenue lors de l\'ajout du film. Veuillez réessayer.');
-        },
-      });
   }
 }
