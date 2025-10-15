@@ -18,9 +18,9 @@ import { UserMovieAddModalComponent } from '../shared/user-movie-add-modal/user-
     ReactiveFormsModule,
     SearchBarComponent,
     MovieResultsComponent,
-    UserMovieAddModalComponent
+    UserMovieAddModalComponent,
   ],
-  templateUrl: './search.component.html'
+  templateUrl: './search.component.html',
 })
 export class SearchComponent {
   queryControl = new FormControl('', { nonNullable: true });
@@ -53,27 +53,28 @@ export class SearchComponent {
   constructor() {
     this.queryControl.valueChanges
       .pipe(
-        debounceTime(300), 
+        debounceTime(300),
         distinctUntilChanged(),
         tap(() => {
           this.loading.set(true);
           this.searchPerformed.set(true);
         }),
-        filter(query => query.trim().length > 0),
-        switchMap(query =>
-          this.movieService.searchMovies(query.trim())
-            .pipe(finalize(() => this.loading.set(false)))
-        )
+        filter((query) => query.trim().length > 0),
+        switchMap((query) =>
+          this.movieService
+            .searchMovies(query.trim())
+            .pipe(finalize(() => this.loading.set(false))),
+        ),
       )
       .subscribe({
-        next: results => {
+        next: (results) => {
           this.currentPage.set(1);
           this.movies.set(Array.isArray(results) ? results : []);
         },
         error: () => {
           this.currentPage.set(1);
           this.movies.set([]);
-        }
+        },
       });
   }
 
@@ -85,7 +86,6 @@ export class SearchComponent {
 
     this.router.navigate(['/user', user.id]);
   }
-
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
@@ -122,7 +122,7 @@ export class SearchComponent {
     }
 
     this.router.navigate(['informations', movieId], {
-      state: { movie }
+      state: { movie },
     });
   }
 }

@@ -68,19 +68,28 @@
         [routerLinkActiveOptions]="{ exact: true }"
         >Accueil</a
       >
+      @if (isAuthenticated()) {
+        <a
+          [routerLink]="['/user', userId()]"
+          (click)="menuOpen.set(false)"
+          class="hover:text-monokai-green"
+          routerLinkActive="text-monokai-green font-semibold"
+          >Mes films</a
+        >
+        <a
+          routerLink="/friends"
+          (click)="menuOpen.set(false)"
+          class="hover:text-monokai-green"
+          routerLinkActive="text-monokai-green font-semibold"
+          >Mes amis</a
+        >
+      }
       <a
-        [routerLink]="['/user', userId()]"
+        routerLink="/trending"
         (click)="menuOpen.set(false)"
         class="hover:text-monokai-green"
         routerLinkActive="text-monokai-green font-semibold"
-        >Mes films</a
-      >
-      <a
-        routerLink="/profil"
-        (click)="menuOpen.set(false)"
-        class="hover:text-monokai-green"
-        routerLinkActive="text-monokai-green font-semibold"
-        >Je sais pas quoi mettre ici</a
+        >Recommendations</a
       >
     </div>
   </div>

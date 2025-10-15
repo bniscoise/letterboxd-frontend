@@ -22,7 +22,7 @@ export class UserMovieService {
     movieId: number,
     rating: number | null,
     review: string | null,
-    token?: string
+    token?: string,
   ): Observable<UserMovieDto> {
     let params = new HttpParams();
     if (rating !== null && rating !== undefined) {
@@ -32,31 +32,26 @@ export class UserMovieService {
       params = params.set('review', review);
     }
 
-    const headers = token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : undefined;
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
 
-    return this.http.post<UserMovieDto>(
-      `${this.baseUrl}/${userId}/${movieId}`,
-      null,
-      { params, headers }
-    );
+    return this.http.post<UserMovieDto>(`${this.baseUrl}/${userId}/${movieId}`, null, {
+      params,
+      headers,
+    });
   }
-  
+
   getUserMovies(userId: number, token?: string) {
-  const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
-  return this.http.get<UserMovieDto[]>(`${this.baseUrl}/${userId}`, { headers });
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+    return this.http.get<UserMovieDto[]>(`${this.baseUrl}/${userId}`, { headers });
   }
 
   deleteUserMovie(userId: number, movieId: number, token?: string) {
-    const headers = token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : undefined;
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
 
     return this.http.delete<void>(`${this.baseUrl}/${userId}/${movieId}`, { headers });
   }
 
-  getMovieReviews(movieId: number): Observable<UserMovieDto[]>{
+  getMovieReviews(movieId: number): Observable<UserMovieDto[]> {
     return this.http.get<UserMovieDto[]>(`${this.baseUrl}/movie/${movieId}`);
   }
 }

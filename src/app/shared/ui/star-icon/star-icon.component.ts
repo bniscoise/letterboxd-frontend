@@ -8,7 +8,7 @@ let uniqueId = 0;
   standalone: true,
   imports: [CommonModule],
   templateUrl: './star-icon.component.html',
-  styleUrl: './star-icon.component.css'
+  styleUrl: './star-icon.component.css',
 })
 export class StarIconComponent {
   private static readonly VIEW_BOX_WIDTH = 423.938;

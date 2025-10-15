@@ -1,0 +1,13 @@
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+.poster-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--monokai-border, #403f3f);
+  background-color: rgba(64, 63, 63, 0.35);
+}

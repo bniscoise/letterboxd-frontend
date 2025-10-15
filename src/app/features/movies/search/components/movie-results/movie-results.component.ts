@@ -6,7 +6,7 @@ import { MovieDto } from '../../../../../core/services/movie.service';
   selector: 'app-movie-results',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './movie-results.component.html'
+  templateUrl: './movie-results.component.html',
 })
 export class MovieResultsComponent {
   @Input() loading = false;

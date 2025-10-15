@@ -9,7 +9,7 @@ import { UserMovieDto } from '../../../../../core/services/user-movie.service';
   standalone: true,
   imports: [CommonModule, RouterLink, RatingStarsComponent],
   templateUrl: './movie-review-list.component.html',
-  styleUrls: ['./movie-review-list.component.css']
+  styleUrls: ['./movie-review-list.component.css'],
 })
 export class MovieReviewListComponent {
   @Input() reviews: UserMovieDto[] = [];

@@ -1,0 +1,17 @@
+.friends-layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .friends-layout {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .friends-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  }
+}
