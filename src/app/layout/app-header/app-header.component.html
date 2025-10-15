@@ -1,17 +1,31 @@
 <header
-  class="sticky top-0 z-50 border-b border-monokai-border bg-monokai-surface/90 backdrop-blur supports-[backdrop-filter]:bg-monokai-surface/70"
+  class="relative border-b border-monokai-border bg-monokai-background/90 backdrop-blur supports-[backdrop-filter]:bg-monokai-background/80"
 >
-  <div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+    <div>
+      <button
+        type="button"
+        class="burger-button relative flex h-8 w-8 flex-col items-center justify-center gap-1.5 focus:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
+        (click)="toggleMenu()"
+        [class.is-open]="menuOpen()"
+      >
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+        <span aria-hidden="true" class="circle"></span>
+      </button>
+    </div>
+
     <a
       routerLink="/search"
-      class="text-xl font-semibold text-monokai-green transition hover:text-monokai-yellow focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
+      class="text-4xl font-semibold text-monokai-green transition hover:text-monokai-yellow focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
     >
       Movieboxd
     </a>
 
     <div class="flex items-center gap-3 text-sm">
       @if (isAuthenticated()) {
-        <span class="hidden sm:inline text-monokai-muted">Bienvenue {{ username() }} !</span>
+        <span class="hidden sm:inline text-monokai-muted">Bonjour {{ username() }}</span>
         <button
           type="button"
           class="rounded-lg border border-transparent bg-monokai-accent px-3 py-2 font-semibold text-monokai-background transition hover:bg-monokai-yellow focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
@@ -22,19 +36,52 @@
       } @else {
         <button
           type="button"
+          class="rounded-lg bg-monokai-green px-3 py-2 font-semibold text-monokai-background transition hover:bg-monokai-yellow focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
+          (click)="openRegister.emit()"
+        >
+          S'inscrire
+        </button>
+        <button
+          type="button"
           class="rounded-lg border border-monokai-border bg-monokai-surface px-3 py-2 font-medium transition hover:border-monokai-accent hover:text-monokai-accent focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
           (click)="openLogin.emit()"
         >
           Se connecter
         </button>
-        <button
-          type="button"
-          class="rounded-lg bg-monokai-green px-3 py-2 font-semibold text-monokai-background transition hover:bg-monokai-yellow focus-visible:outline-none focus-visible:ring focus-visible:ring-monokai-accent"
-          (click)="openRegister.emit()"
-        >
-          Créer un compte
-        </button>
       }
+    </div>
+  </div>
+
+  <div
+    class="absolute left-0 right-0 bg-monokai-surface text-monokai-text overflow-hidden transition-all duration-300 origin-top"
+    [class.opacity-0]="!menuOpen()"
+    [class.opacity-100]="menuOpen()"
+    [class.scale-y-0]="!menuOpen()"
+    [class.scale-y-100]="menuOpen()"
+  >
+    <div class="flex flex-col px-6 py-4 space-y-3 text-lg">
+      <a
+        routerLink="/search"
+        (click)="menuOpen.set(false)"
+        class="hover:text-monokai-green"
+        routerLinkActive="text-monokai-green font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Accueil</a
+      >
+      <a
+        [routerLink]="['/user', userId()]"
+        (click)="menuOpen.set(false)"
+        class="hover:text-monokai-green"
+        routerLinkActive="text-monokai-green font-semibold"
+        >Mes films</a
+      >
+      <a
+        routerLink="/profil"
+        (click)="menuOpen.set(false)"
+        class="hover:text-monokai-green"
+        routerLinkActive="text-monokai-green font-semibold"
+        >Je sais pas quoi mettre ici</a
+      >
     </div>
   </div>
 </header>
