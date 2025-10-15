@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RatingStarsComponent } from '../../../../../shared/ui/rating-stars/rating-stars.component';
 import { UserMovieDto } from '../../../../../core/services/user-movie.service';
@@ -13,14 +6,14 @@ import { UserMovieDto } from '../../../../../core/services/user-movie.service';
 export enum UserMovieSort {
   Original = 'original',
   RatingAsc = 'ratingAsc',
-  RatingDesc = 'ratingDesc'
+  RatingDesc = 'ratingDesc',
 }
 
 @Component({
   selector: 'app-user-movie-list',
   standalone: true,
   imports: [CommonModule, RatingStarsComponent],
-  templateUrl: './user-movie-list.component.html'
+  templateUrl: './user-movie-list.component.html',
 })
 export class UserMovieListComponent implements OnChanges {
   @Input({ required: true }) userMovies: UserMovieDto[] = [];

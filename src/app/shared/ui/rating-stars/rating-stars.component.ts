@@ -7,7 +7,7 @@ import { StarIconComponent } from '../star-icon/star-icon.component';
   standalone: true,
   imports: [CommonModule, StarIconComponent],
   templateUrl: 'rating-stars.component.html',
-  styleUrl: 'rating-stars.component.css'
+  styleUrl: 'rating-stars.component.css',
 })
 export class RatingStarsComponent {
   private static readonly STEP = 0.5;

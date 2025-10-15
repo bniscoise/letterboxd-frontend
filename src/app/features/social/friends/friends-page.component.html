@@ -1,0 +1,205 @@
+<div class="space-y-6">
+  <header class="space-y-2">
+    <h1 class="text-2xl font-semibold text-monokai-green">Mes amis</h1>
+    <p class="text-sm text-monokai-muted">
+      Recherchez des utilisateurs, explorez leurs listes et suivez vos coups de cœur.
+    </p>
+  </header>
+
+  <section
+    class="space-y-4 rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow-monokai"
+  >
+    <div class="space-y-2">
+      <label class="text-sm font-semibold text-monokai-muted" for="friend-search">
+        Recherche d'utilisateurs
+      </label>
+      <input
+        id="friend-search"
+        type="text"
+        class="w-full rounded-lg border border-monokai-border bg-monokai-surface px-4 py-2 text-sm text-monokai-text placeholder:text-monokai-muted focus:border-monokai-accent focus:outline-none focus:ring-2 focus:ring-monokai-accent"
+        placeholder="Recherchez un nom d'utilisateur (au moins 2 caractères)"
+        [formControl]="searchControl"
+      />
+    </div>
+
+    @if (searchError()) {
+      <p class="text-sm text-red-300">{{ searchError() }}</p>
+    }
+
+    @if (loadingSearch()) {
+      <div class="flex items-center gap-3 text-sm text-monokai-muted">
+        <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"></span>
+        <span>Recherche des utilisateurs…</span>
+      </div>
+    } @else if (searchPerformed() && searchResults().length === 0 && !searchError()) {
+      @if (lastQuery().length < 2) {
+        <p class="text-sm text-monokai-muted">
+          Entrez au moins deux caractères pour lancer une recherche.
+        </p>
+      } @else {
+        <p class="text-sm text-monokai-muted">
+          Aucun utilisateur trouvé pour cette recherche. Essayez un autre nom.
+        </p>
+      }
+    }
+
+    @if (searchResults().length > 0) {
+      <ul class="divide-y divide-monokai-border rounded-lg border border-monokai-border">
+        @for (user of searchResults(); track user.id) {
+          <li
+            class="flex items-center justify-between gap-3 px-4 py-3 transition-colors"
+            [ngClass]="{
+              'bg-monokai-surface-highlight/60': selectedUser()?.id === user.id,
+              'hover:bg-monokai-surface/60': selectedUser()?.id !== user.id
+            }"
+          >
+            <div class="space-y-1">
+              <p class="text-sm font-semibold text-monokai-text">{{ user.username }}</p>
+              <p class="text-xs text-monokai-muted">{{ user.email }}</p>
+            </div>
+            <button
+              type="button"
+              class="rounded-lg border border-monokai-border px-3 py-2 text-sm transition hover:border-monokai-accent hover:text-monokai-accent"
+              (click)="onSelectUser(user)"
+            >
+              Voir la liste
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <div class="friends-layout">
+    <section
+      class="space-y-4 rounded-xl border border-monokai-border bg-monokai-surface-highlight/70 p-5 shadow-monokai"
+    >
+      @if (selectedUser(); as viewing) {
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-xl font-semibold text-monokai-green">
+              Liste de {{ viewing.username }}
+            </h2>
+            <p class="text-xs text-monokai-muted">Découvrez les films ajoutés par cet utilisateur.</p>
+          </div>
+
+          @if (canFollowSelectedUser()) {
+            <button
+              type="button"
+              class="w-full rounded-lg bg-monokai-accent px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              (click)="followSelectedUser()"
+              [disabled]="followMutationLoading()"
+            >
+              @if (followMutationLoading()) {
+                Patientez…
+              } @else {
+                {{ selectedUserIsFollowed() ? 'Ne plus suivre' : 'Suivre' }}
+              }
+            </button>
+          } @else if (!isAuthenticated()) {
+            <p class="text-xs text-monokai-muted">
+              Connectez-vous pour suivre d'autres utilisateurs.
+            </p>
+          } @else if (selectedUserIsCurrent()) {
+            <p class="text-xs text-monokai-muted">
+              C'est vous ! Explorez votre liste depuis la page « Mes films ».
+            </p>
+          }
+        </div>
+
+        @if (followError()) {
+          <p class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            {{ followError() }}
+          </p>
+        }
+
+        @if (moviesError()) {
+          <p class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            {{ moviesError() }}
+          </p>
+        }
+
+        <app-user-movie-list
+          [userMovies]="selectedUserMovies()"
+          [pagedUserMovies]="pagedUserMovies()"
+          [loading]="moviesLoading()"
+          [reviewOpen]="reviewOpen()"
+          [canToggleReview]="canToggleReview()"
+          [reviewButtonLabel]="'Voir la review'"
+          [canDelete]="false"
+          [currentPage]="currentPage()"
+          [totalPages]="totalPages()"
+          [pageNumbers]="pageNumbers()"
+          [sortMode]="sortMode()"
+          (reviewToggle)="toggleReview($event)"
+          (viewInformation)="viewUserMovieInformation($event)"
+          (previousPage)="previousPage()"
+          (nextPage)="nextPage()"
+          (goToPage)="goToPage($event)"
+          (sortChange)="onSortChange($event)"
+        ></app-user-movie-list>
+      } @else {
+        <div class="space-y-3 text-sm text-monokai-muted">
+          <h2 class="text-lg font-semibold text-monokai-text">Aucun utilisateur sélectionné</h2>
+          <p>
+            Recherchez un utilisateur ci-dessus, puis cliquez sur « Voir la liste » pour explorer ses
+            films et le suivre.
+          </p>
+        </div>
+      }
+    </section>
+
+    <aside
+      class="space-y-4 rounded-xl border border-monokai-border bg-monokai-surface/60 p-5 text-sm text-monokai-text"
+    >
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-monokai-text">Following</h2>
+        @if (isAuthenticated()) {
+          <span class="rounded-full bg-monokai-surface-highlight px-2 py-1 text-xs text-monokai-muted">
+            {{ followingUsers().length }}
+          </span>
+        }
+      </div>
+
+      @if (!isAuthenticated()) {
+        <p class="text-sm text-monokai-muted">
+          Connectez-vous pour suivre d'autres cinéphiles et visualiser votre liste.
+        </p>
+      } @else if (followingLoading()) {
+        <div class="flex items-center gap-3 text-sm text-monokai-muted">
+          <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"></span>
+          <span>Chargement de vos suivis…</span>
+        </div>
+      } @else if (followingError()) {
+        <p class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          {{ followingError() }}
+        </p>
+      } @else if (followingUsers().length === 0) {
+        <p class="text-sm text-monokai-muted">
+          Vous ne suivez encore personne. Recherchez un utilisateur et cliquez sur « Suivre » pour
+          commencer.
+        </p>
+      } @else {
+        <ul class="space-y-3">
+          @for (user of followingUsers(); track user.id) {
+            <li
+              class="flex items-center justify-between rounded-lg border border-monokai-border bg-monokai-surface-highlight/60 px-3 py-2 transition hover:border-monokai-accent"
+            >
+              <div>
+                <p class="text-sm font-semibold text-monokai-text">{{ user.username }}</p>
+                <p class="text-xs text-monokai-muted">{{ user.email }}</p>
+              </div>
+              <button
+                type="button"
+                class="rounded-lg border border-monokai-border px-3 py-1 text-xs font-medium transition hover:border-monokai-accent hover:text-monokai-accent"
+                (click)="onSelectUser(user)"
+              >
+                Voir la liste
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+</div>

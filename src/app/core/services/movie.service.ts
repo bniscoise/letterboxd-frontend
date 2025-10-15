@@ -12,7 +12,6 @@ export interface MovieDto {
   voteCount?: number;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class MovieService {
   private http = inject(HttpClient);

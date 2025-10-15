@@ -10,14 +10,9 @@ import { UserMovieAddModalComponent } from '../shared/user-movie-add-modal/user-
 @Component({
   selector: 'app-movie-information',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    MovieReviewListComponent,
-    UserMovieAddModalComponent
-  ],
+  imports: [CommonModule, RouterLink, MovieReviewListComponent, UserMovieAddModalComponent],
   templateUrl: './movie-information.component.html',
-  styleUrl: './movie-information.component.css'
+  styleUrl: './movie-information.component.css',
 })
 export class MovieInformationComponent {
   private readonly route = inject(ActivatedRoute);
@@ -27,10 +22,9 @@ export class MovieInformationComponent {
 
   readonly movieId = Number(this.route.snapshot.paramMap.get('movieId'));
   readonly movie =
-    (this.router.currentNavigation()?.extras.state?.['movie'] ?? history.state?.['movie']) as
+    ((this.router.currentNavigation()?.extras.state?.['movie'] ?? history.state?.['movie']) as
       | MovieDto
-      | undefined ?? null;
-
+      | undefined) ?? null;
 
   readonly loadingReviews = signal(true);
   readonly reviews = signal<UserMovieDto[]>([]);
@@ -82,7 +76,7 @@ export class MovieInformationComponent {
       error: () => {
         this.loadError.set('Impossible de charger les critiques.');
         this.loadingReviews.set(false);
-      }
+      },
     });
   }
 }

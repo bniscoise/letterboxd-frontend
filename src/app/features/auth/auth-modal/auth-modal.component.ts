@@ -8,46 +8,6 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="space-y-5">
-      <div class="space-y-3">
-        <span class="text-xs uppercase tracking-[0.3em] text-monokai-muted">Notez vos films préférés!</span>
-        <h1 class="text-4xl font-semibold text-monokai-green drop-shadow">Movieboxd par Benjamin Nisçoise </h1>
-        <p class="max-w-xl text-monokai-yellow/90">
-          Un projet en Java Spring Boot et Angular
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-3 py-2 " *ngIf="!isAuthenticated; else loggedIn">
-        <button
-          type="button"
-          class="rounded-lg border border-monokai-border bg-monokai-surface px-4 py-2 text-sm font-medium transition hover:border-monokai-accent hover:text-monokai-accent"
-          (click)="openLoginModal()"
-        >
-          Se connecter
-        </button>
-        <button
-          type="button"
-          class="rounded-lg bg-monokai-green px-4 py-2 text-sm font-semibold text-monokai-background transition hover:bg-monokai-yellow hover:text-monokai-background"
-          (click)="openRegisterModal()"
-        >
-          Créer un compte
-        </button>
-      </div>
-
-      <ng-template #loggedIn>
-        <div class="flex flex-wrap items-center gap-3 rounded-lg border border-monokai-border bg-monokai-surface px-4 py-3 text-sm">
-          <span>Bonjour {{ user?.username }} 👋</span>
-          <button
-            type="button"
-            class="rounded-lg border border-transparent bg-monokai-accent px-3 py-2 font-semibold text-monokai-background transition hover:bg-monokai-yellow"
-            (click)="logout.emit()"
-          >
-            Se déconnecter
-          </button>
-        </div>
-      </ng-template>
-    </div>
-
     <div *ngIf="isModalOpen" class="fixed inset-0 z-40 flex items-center justify-center">
       <div class="absolute inset-0 bg-black/80" (click)="closeModals()"></div>
 
@@ -89,7 +49,10 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 required
               />
             </label>
-            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+            <div
+              *ngIf="authError"
+              class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+            >
               {{ authError }}
             </div>
             <button
@@ -136,10 +99,13 @@ import { AuthUser, LoginPayload, RegisterPayload } from '../../../core/services/
                 [(ngModel)]="registerForm.password"
                 class="w-full rounded-lg border border-monokai-border bg-monokai-background px-3 py-2 text-monokai-text focus:border-monokai-accent focus:outline-none"
                 autocomplete="new-password"
-              required
+                required
               />
             </label>
-            <div *ngIf="authError" class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+            <div
+              *ngIf="authError"
+              class="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+            >
               {{ authError }}
             </div>
             <button
@@ -160,7 +126,6 @@ export class AuthModalComponent implements OnChanges {
   @Input() authError: string | null = null;
   @Output() login = new EventEmitter<LoginPayload>();
   @Output() register = new EventEmitter<RegisterPayload>();
-  @Output() logout = new EventEmitter<void>();
   @Output() clearError = new EventEmitter<void>();
 
   showLoginModal = false;

@@ -6,7 +6,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-search-bar',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './search-bar.component.html'
+  templateUrl: './search-bar.component.html',
 })
 export class SearchBarComponent {
   @Input({ required: true }) control!: FormControl<string>;
