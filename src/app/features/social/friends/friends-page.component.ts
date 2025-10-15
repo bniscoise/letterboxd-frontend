@@ -224,7 +224,7 @@ export class FriendsPageComponent {
         },
         error: () => {
           this.selectedUserMovies.set([]);
-          this.moviesError.set("Impossible de charger la liste de cet utilisateur pour le moment.");
+          this.moviesError.set('Impossible de charger la liste de cet utilisateur pour le moment.');
         },
       });
   }
@@ -311,7 +311,7 @@ export class FriendsPageComponent {
           });
         },
         error: () => {
-          this.followError.set("Impossible de suivre cet utilisateur pour le moment.");
+          this.followError.set('Impossible de suivre cet utilisateur pour le moment.');
         },
       });
   }
@@ -335,9 +335,7 @@ export class FriendsPageComponent {
       )
       .subscribe({
         next: () => {
-          this.followingUsers.update((list) =>
-            list.filter((user) => user.id !== target.id),
-          );
+          this.followingUsers.update((list) => list.filter((user) => user.id !== target.id));
         },
         error: () => {
           this.followError.set("Impossible d'arrêter de suivre cet utilisateur pour le moment.");
@@ -377,14 +375,12 @@ export class FriendsPageComponent {
       )
       .subscribe({
         next: (users) => {
-          const sorted = (users ?? []).slice().sort((a, b) =>
-            a.username.localeCompare(b.username),
-          );
+          const sorted = (users ?? []).slice().sort((a, b) => a.username.localeCompare(b.username));
           this.followingUsers.set(sorted);
         },
         error: () => {
           this.followingUsers.set([]);
-          this.followingError.set("Impossible de récupérer vos suivis pour le moment.");
+          this.followingError.set('Impossible de récupérer vos suivis pour le moment.');
         },
       });
   }
