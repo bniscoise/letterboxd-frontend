@@ -28,7 +28,9 @@
 
     @if (loadingSearch()) {
       <div class="flex items-center gap-3 text-sm text-monokai-muted">
-        <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"></span>
+        <span
+          class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"
+        ></span>
         <span>Recherche des utilisateurs…</span>
       </div>
     } @else if (searchPerformed() && searchResults().length === 0 && !searchError()) {
@@ -50,7 +52,7 @@
             class="flex items-center justify-between gap-3 px-4 py-3 transition-colors"
             [ngClass]="{
               'bg-monokai-surface-highlight/60': selectedUser()?.id === user.id,
-              'hover:bg-monokai-surface/60': selectedUser()?.id !== user.id
+              'hover:bg-monokai-surface/60': selectedUser()?.id !== user.id,
             }"
           >
             <div class="space-y-1">
@@ -80,7 +82,9 @@
             <h2 class="text-xl font-semibold text-monokai-green">
               Liste de {{ viewing.username }}
             </h2>
-            <p class="text-xs text-monokai-muted">Découvrez les films ajoutés par cet utilisateur.</p>
+            <p class="text-xs text-monokai-muted">
+              Découvrez les films ajoutés par cet utilisateur.
+            </p>
           </div>
 
           @if (canFollowSelectedUser()) {
@@ -108,13 +112,17 @@
         </div>
 
         @if (followError()) {
-          <p class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          <p
+            class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+          >
             {{ followError() }}
           </p>
         }
 
         @if (moviesError()) {
-          <p class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          <p
+            class="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+          >
             {{ moviesError() }}
           </p>
         }
@@ -142,8 +150,8 @@
         <div class="space-y-3 text-sm text-monokai-muted">
           <h2 class="text-lg font-semibold text-monokai-text">Aucun utilisateur sélectionné</h2>
           <p>
-            Recherchez un utilisateur ci-dessus, puis cliquez sur « Voir la liste » pour explorer ses
-            films et le suivre.
+            Recherchez un utilisateur ci-dessus, puis cliquez sur « Voir la liste » pour explorer
+            ses films et le suivre.
           </p>
         </div>
       }
@@ -155,7 +163,9 @@
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-monokai-text">Following</h2>
         @if (isAuthenticated()) {
-          <span class="rounded-full bg-monokai-surface-highlight px-2 py-1 text-xs text-monokai-muted">
+          <span
+            class="rounded-full bg-monokai-surface-highlight px-2 py-1 text-xs text-monokai-muted"
+          >
             {{ followingUsers().length }}
           </span>
         }
@@ -167,7 +177,9 @@
         </p>
       } @else if (followingLoading()) {
         <div class="flex items-center gap-3 text-sm text-monokai-muted">
-          <span class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"></span>
+          <span
+            class="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-monokai-border border-t-monokai-accent"
+          ></span>
           <span>Chargement de vos suivis…</span>
         </div>
       } @else if (followingError()) {
