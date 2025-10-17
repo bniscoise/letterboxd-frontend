@@ -22,7 +22,7 @@ export interface TopTrendingMovie {
 @Injectable({ providedIn: 'root' })
 export class TrendingService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/trending';
+  private readonly baseUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/trending';
 
   getLatestRatings(): Observable<RecentTrendingMovie[]> {
     return this.http.get<RecentTrendingMovie[]>(`${this.baseUrl}/latest`);

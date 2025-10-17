@@ -11,7 +11,7 @@ export interface UserDto {
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/users';
+  private readonly baseUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/users';
 
   getUserById(userId: number, token?: string): Observable<UserDto> {
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;

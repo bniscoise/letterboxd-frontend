@@ -15,7 +15,7 @@ export interface UserMovieDto {
 @Injectable({ providedIn: 'root' })
 export class UserMovieService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/user-movies';
+  private readonly baseUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/user-movies';
 
   addOrUpdateUserMovie(
     userId: number,

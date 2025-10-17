@@ -31,17 +31,21 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.userSignal() !== null);
 
   login(payload: LoginPayload): Observable<AuthUser> {
-    return this.http.post<AuthUser>('http://localhost:8080/api/auth/login', payload).pipe(
-      tap((user) => this.persistUser(user)),
-      catchError((err) => this.handleError(err)),
-    );
+    return this.http
+      .post<AuthUser>('https://movieboxd-backend-2sw9.onrender.com/api/auth/login', payload)
+      .pipe(
+        tap((user) => this.persistUser(user)),
+        catchError((err) => this.handleError(err)),
+      );
   }
 
   register(payload: RegisterPayload): Observable<AuthUser> {
-    return this.http.post<AuthUser>('http://localhost:8080/api/auth/register', payload).pipe(
-      tap((user) => this.persistUser(user)),
-      catchError((err) => this.handleError(err)),
-    );
+    return this.http
+      .post<AuthUser>('https://movieboxd-backend-2sw9.onrender.com/api/auth/register', payload)
+      .pipe(
+        tap((user) => this.persistUser(user)),
+        catchError((err) => this.handleError(err)),
+      );
   }
 
   logout(): void {

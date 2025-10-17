@@ -15,7 +15,7 @@ export interface MovieDto {
 @Injectable({ providedIn: 'root' })
 export class MovieService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/movies';
+  private readonly apiUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/movies';
 
   searchMovies(query: string): Observable<MovieDto[]> {
     if (!query.trim()) {
