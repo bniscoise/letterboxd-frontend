@@ -1,6 +1,7 @@
 import { inject, Injectable, computed, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface LoginPayload {
   username: string;
@@ -32,7 +33,7 @@ export class AuthService {
 
   login(payload: LoginPayload): Observable<AuthUser> {
     return this.http
-      .post<AuthUser>('https://movieboxd-backend-2sw9.onrender.com/api/auth/login', payload)
+      .post<AuthUser>(`${API_BASE_URL}/auth/login`, payload)
       .pipe(
         tap((user) => this.persistUser(user)),
         catchError((err) => this.handleError(err)),
@@ -41,7 +42,7 @@ export class AuthService {
 
   register(payload: RegisterPayload): Observable<AuthUser> {
     return this.http
-      .post<AuthUser>('https://movieboxd-backend-2sw9.onrender.com/api/auth/register', payload)
+      .post<AuthUser>(`${API_BASE_URL}/auth/register`, payload)
       .pipe(
         tap((user) => this.persistUser(user)),
         catchError((err) => this.handleError(err)),

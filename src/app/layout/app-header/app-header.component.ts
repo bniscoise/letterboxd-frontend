@@ -5,6 +5,7 @@ import { AuthUser } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.css',

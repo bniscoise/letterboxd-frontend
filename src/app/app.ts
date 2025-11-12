@@ -1,8 +1,10 @@
-import { Component, inject, viewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, viewChild, DestroyRef } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthModalComponent } from './features/auth/auth-modal/auth-modal.component';
 import { AuthService, LoginPayload, RegisterPayload } from './core/services/auth.service';
 import { AppHeaderComponent } from './layout/app-header/app-header.component';
+import { AuthModalService } from './core/services/auth-modal.service';
 
 @Component({
   selector: 'app-root',
@@ -41,18 +43,31 @@ import { AppHeaderComponent } from './layout/app-header/app-header.component';
   `,
 })
 export class App {
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly authModal = viewChild(AuthModalComponent);
+  private readonly authModalService = inject(AuthModalService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly isAuthenticated = this.authService.isAuthenticated;
   protected readonly currentUser = this.authService.user;
   protected authError: string | null = null;
+
+  constructor() {
+    this.authModalService.open$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cmd) => {
+      if (cmd === 'login') this.authModal()?.openLoginModal();
+      else if (cmd === 'register') this.authModal()?.openRegisterModal();
+      else this.authModal()?.closeModals();
+    });
+  }
 
   onLogin(payload: LoginPayload): void {
     this.authError = null;
     this.authService.login(payload).subscribe({
       next: () => {
         this.authError = null;
+        this.authModalService.closeAll();
+        this.router.navigateByUrl('/search');
       },
       error: (error) => {
         console.error('Login failed', error);
@@ -66,6 +81,8 @@ export class App {
     this.authService.register(payload).subscribe({
       next: () => {
         this.authError = null;
+        this.authModalService.closeAll();
+        this.router.navigateByUrl('/search');
       },
       error: (error) => {
         console.error('Registration failed', error);
@@ -76,7 +93,9 @@ export class App {
 
   onLogout(): void {
     this.authService.logout();
+    this.authModalService.closeAll();
     this.authModal()?.closeModals();
+    this.router.navigateByUrl('/');
   }
 
   protected showLoginModal(): void {

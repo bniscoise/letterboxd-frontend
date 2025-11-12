@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface UserMovieDto {
   movieId: number;
@@ -15,7 +16,7 @@ export interface UserMovieDto {
 @Injectable({ providedIn: 'root' })
 export class UserMovieService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/user-movies';
+  private readonly baseUrl = `${API_BASE_URL}/user-movies`;
 
   addOrUpdateUserMovie(
     userId: number,

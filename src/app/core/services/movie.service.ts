@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface MovieDto {
   id: number;
@@ -15,7 +16,7 @@ export interface MovieDto {
 @Injectable({ providedIn: 'root' })
 export class MovieService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/movies';
+  private readonly apiUrl = `${API_BASE_URL}/movies`;
 
   searchMovies(query: string): Observable<MovieDto[]> {
     if (!query.trim()) {

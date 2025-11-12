@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface UserDto {
   id: number;
@@ -11,7 +12,7 @@ export interface UserDto {
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'https://movieboxd-backend-2sw9.onrender.com/api/users';
+  private readonly baseUrl = `${API_BASE_URL}/users`;
 
   getUserById(userId: number, token?: string): Observable<UserDto> {
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
